@@ -1,0 +1,2 @@
+## ABOUT THIS
+NES Emulator
