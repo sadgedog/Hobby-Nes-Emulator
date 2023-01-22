@@ -9,9 +9,9 @@ impl CPU {
     pub fn new() -> Self {
 	CPU {
 	    register_a: 0,
+	    register_x: 0,
 	    status: 0,
 	    program_counter: 0,
-	    register_x: 0,
 	}
     }
 
@@ -39,6 +39,11 @@ impl CPU {
 	}
     }
 
+    fn inx(&mut self) {
+	self.register_x = self.register_x.wrapping_add(1);
+	self.update_zero_and_negative_flags(self.register_x);
+    }
+    
     pub fn interpret(&mut self, program: Vec<u8>) {
 	self.program_counter = 0;
 
@@ -56,8 +61,11 @@ impl CPU {
 
 		// TAX (Transfer Accumulator to X)
 		0xAA => self.tax(),
+
+		// INX
+		0xE8 => self.inx(),
 		
-		// exit
+		// BRK (Force Interrupt)
 		0x00 => return,
 
 		_ => todo!()
@@ -94,5 +102,20 @@ mod test {
 	cpu.register_a = 10;
 	cpu.interpret(vec![0xaa, 0x00]);
 	assert_eq!(cpu.register_x, 10);
+    }
+
+    #[test]
+    fn test_5_ops_working_together() {
+	let mut cpu = CPU::new();
+	cpu.interpret(vec![0xa9, 0xc0, 0xaa, 0xe8, 0x00]);	
+	assert_eq!(cpu.register_x, 0xc1)
+    }
+
+    #[test]
+    fn test_inx_overflow() {
+        let mut cpu = CPU::new();
+        cpu.register_x = 0xff;
+        cpu.interpret(vec![0xe8, 0xe8, 0x00]);
+        assert_eq!(cpu.register_x, 1)
     }
 }
