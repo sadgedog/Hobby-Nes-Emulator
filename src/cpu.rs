@@ -78,7 +78,7 @@ impl CPU {
 #[cfg(test)]
 mod test {
     use super::*;
-    // LDA tests
+
     #[test]
     fn test_0xa9_lda_immidiate_load_data() {
 	let mut cpu = CPU:: new();
@@ -95,7 +95,13 @@ mod test {
 	assert!(cpu.status & 0b0000_0010 == 0b10);
     }
 
-    // TAX tests
+    #[test]
+    fn test_0xa9_lda_negative_flag() {
+	let mut cpu = CPU::new();
+	cpu.interpret(vec![0xa9, 0xff, 0x00]);
+	assert!(cpu.status & 0b1000_0000 == 0b1000_0000);
+    }
+
     #[test]
     fn test_0xaa_tax_move_a_to_x() {
 	let mut cpu = CPU::new();
