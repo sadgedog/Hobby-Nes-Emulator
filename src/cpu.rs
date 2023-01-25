@@ -175,6 +175,7 @@ impl CPU {
 	self.register_a = 0;
 	self.register_x = 0;
 	self.status = 0;
+	// 0xFFFC, 0xFFFDにはloadの時点で0x00,0x800つまり0x8000が入っているはず
 	self.program_counter = self.mem_read_u16(0xFFFC);
     }
     
@@ -182,6 +183,7 @@ impl CPU {
 	let ref opcodes: HashMap<u8, &'static opcodes::OpCode> = *opcodes::OPCODES_MAP;
 	
 	loop {
+	    // 0x8000の値(命令)を読み込む
 	    let code = self.mem_read(self.program_counter);
 	    self.program_counter += 1;
 	    let program_counter_state = self.program_counter;
@@ -193,7 +195,7 @@ impl CPU {
 		0xA9 | 0xA5 | 0xB5 | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
 		}
-		// Sta (Store Accumulator)
+		// STA (Store Accumulator)
 		0x85 | 0x95 | 0x8D | 0x9D | 0x99 | 0x81 | 0x91 => {
 		    self.sta(&opcode.mode);
 		}
