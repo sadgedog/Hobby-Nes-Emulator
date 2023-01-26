@@ -315,6 +315,16 @@ mod test {
     }
 
     #[test]
+    fn test_0x85_sta_immediate() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x85, 0xA8, 0x00]);
+	cpu.reset();
+	cpu.register_a = 0x45;
+	cpu.run();
+	assert_eq!(cpu.mem_read(0xA8), 0x45);
+    }
+
+    #[test]
     fn test_0xaa_tax_move_a_to_x() {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xA9, 0x0A, 0xAA, 0x00]);	
