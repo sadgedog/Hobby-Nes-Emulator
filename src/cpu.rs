@@ -238,12 +238,14 @@ mod test {
 	assert_eq!(cpu.register_a, 0x55);
     }
 
-    // load_and_runでメモリが初期化されていい感じにテストできてない
     #[test]
     fn test_0xb5_lda_zero_page_x() {
 	let mut cpu = CPU::new();
-	cpu.load_and_run(vec![0xB5, 0x0F, 0x00]);
-	assert_eq!(cpu.register_a, 0x00);
+	cpu.load(vec![0xB5, 0x0F, 0x00]);
+	cpu.reset();
+	cpu.mem_write(0x0F, 0x12);	
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x12);
     }
 
     #[test]
@@ -254,11 +256,55 @@ mod test {
     }
 
     #[test]
-    // register_xが初期化されているので略
     fn test_0xbd_lda_absolute_x() {
 	let mut cpu = CPU::new();
-	cpu.load_and_run(vec![0xBD, 0x01, 0x80, 0x00]);
-	assert_eq!(cpu.register_a, 0x01);
+	cpu.load(vec![0xBD, 0x12, 0x34, 0x00]);
+	cpu.reset();
+	cpu.register_x = 0x02;
+	cpu.mem_write_u16(0x3414, 0x34);	
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x34);
+    }
+
+    #[test]
+    fn test_0xb9_lda_absolute_y() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xB9, 0x12, 0x34, 0x00]);
+	cpu.reset();
+	cpu.register_y = 0x01;
+	cpu.mem_write_u16(0x3413, 0x34);	
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x34);
+    }
+
+    // 0x10+0x02=0x12の値(0x34)と0x10+0x02+0x01=0x13の値(0x55)をアドレスとみなして
+    // 0x5534の値をAレジスタに書き込む
+    #[test]
+    fn test_0xa1_lda_indirect_x() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xA1, 0x10, 0x00]);
+	cpu.reset();
+	cpu.register_x = 0x02;
+	cpu.mem_write(0x12, 0x34);
+	cpu.mem_write(0x13, 0x55);
+	cpu.mem_write_u16(0x5534, 0x1F);
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x1F);
+    }
+
+    // 0x10の値(0x34)と0x11の値(0x55)をアドレスとみなして
+    // 0x5534+0x02=0x5536の値をAレジスタに書き込む
+    #[test]
+    fn test_0xb1_lda_uindirect_y() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xB1, 0x10, 0x00]);
+	cpu.reset();
+	cpu.register_y = 0x02;
+	cpu.mem_write(0x10, 0x34);
+	cpu.mem_write(0x11, 0x55);
+	cpu.mem_write_u16(0x5536, 0x1F);
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x1F);
     }
 
     #[test]
