@@ -123,6 +123,20 @@ impl CPU {
 	}
     }
 
+    fn adc(&mut self, mode: &AddressingMode) {
+    }
+
+    fn set_register_a(&mut self, value: u8) {
+	self.register_a = value;
+	self.update_zero_and_negative_flags(self.register_a);
+    }
+
+    fn and(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	self.set_register_a(value & self.register_a);
+    }
+
     fn lda(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -191,6 +205,11 @@ impl CPU {
 	    let opcode = opcodes.get(&code).expect(&format!("OpCode {:x} is not recognized", code));
 
 	    match code {
+		// AND (Logical AND)
+		0x29 | 0x25 | 0x35 | 0x2D | 0x3D | 0x39 | 0x21 | 0x31 => {
+		    self.and(&opcode.mode);
+		}
+		
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
@@ -220,9 +239,20 @@ impl CPU {
 #[cfg(test)]
 mod test {
     use super::*;
+    // AND
+    #[test]
+    fn test_0x29_and_immediate() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x29, 0xAE, 0x00]); // AE => 10101110
+	cpu.reset();
+	cpu.register_a = 0xF3;            // F3 => 11110011
+	cpu.run();
+	assert_eq!(cpu.register_a, 0xA2); // A2 => 10100010
+    }
+    
     // LDA
     #[test]
-    fn test_0xa9_lda_immidiate_load_data() {
+    fn test_0xa9_lda_immediate_load_data() {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xA9, 0x05, 0x00]);	
         assert_eq!(cpu.register_a, 5);
@@ -324,6 +354,7 @@ mod test {
 	assert_eq!(cpu.mem_read(0xA8), 0x45);
     }
 
+    // TAX Transfer Accumulator to X
     #[test]
     fn test_0xaa_tax_move_a_to_x() {
         let mut cpu = CPU::new();
@@ -331,6 +362,15 @@ mod test {
         assert_eq!(cpu.register_x, 10)
     }
 
+    // INX Increment X Register
+    #[test]
+    fn test_inx_overflow() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xA9, 0xFF, 0xAA,0xE8, 0xE8, 0x00]);
+        assert_eq!(cpu.register_x, 1)
+    }
+
+    // other
     #[test]
     fn test_5_ops_working_together() {
         let mut cpu = CPU::new();
@@ -338,10 +378,4 @@ mod test {
         assert_eq!(cpu.register_x, 0xC1)
     }
 
-    #[test]
-    fn test_inx_overflow() {
-        let mut cpu = CPU::new();
-        cpu.load_and_run(vec![0xA9, 0xFF, 0xAA,0xE8, 0xE8, 0x00]);
-        assert_eq!(cpu.register_x, 1)
-    }
 }
