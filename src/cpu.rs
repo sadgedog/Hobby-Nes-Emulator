@@ -122,11 +122,8 @@ impl CPU {
 	    
 	}
     }
-
-    fn adc(&mut self, mode: &AddressingMode) {
-	let addr = self.get_operand_address(&mode);
-	let value = self.mem_read(addr);
-	// sum result
+    
+    fn add_to_register_a(&mut self, value: u8) {
 	let result = self.register_a as u16
 	    + value as u16
 	    + (if self.status & 0x01 == 0x01 {
@@ -153,6 +150,18 @@ impl CPU {
 	}
 	
 	self.set_register_a(tmp);
+    }
+    
+    fn adc(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	self.add_to_register_a(value);
+    }
+
+    fn sbc(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	self.add_to_register_a(((value as i8).wrapping_neg().wrapping_sub(1)) as u8);
     }
 
     fn set_register_a(&mut self, value: u8) {
@@ -237,7 +246,11 @@ impl CPU {
 		// ADC (Add with Carry)
 		0x69 | 0x65 | 0x75 | 0x6D | 0x7D | 0x79 | 0x61 | 0x71 => {
 		    self.adc(&opcode.mode);
-		}		
+		}
+		// SBC (Sbstract with Carry)
+		0xE9 | 0xE5 | 0xF5 | 0xED | 0xFD | 0xF9 | 0xE1 | 0xF1 => {
+		    self.sbc(&opcode.mode);
+		}
 		// AND (Logical AND)
 		0x29 | 0x25 | 0x35 | 0x2D | 0x3D | 0x39 | 0x21 | 0x31 => {
 		    self.and(&opcode.mode);
@@ -326,6 +339,69 @@ mod test {
 	assert_eq!(cpu.register_a, 0x81);
 	assert_eq!(cpu.status, 0xC0); // overflow flag and negative flag
     }
+
+    // SBC A-M-(1-C)
+    #[test]
+    fn test_0xe9_sbc_immediate() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xE9, 0x01, 0x00]); 
+	cpu.reset();
+	cpu.register_a = 0x10;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x0E);
+    }
+
+    #[test]
+    fn test_0xe9_sbc_calc_with_carry() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xE9, 0x10, 0x00]); 
+	cpu.reset();
+	cpu.status = 0x01; // carry flag
+	cpu.register_a = 0x50;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x40);
+    }
+
+    #[test]
+    fn test_0xe9_sbc_set_carry() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xE9, 0x03, 0x00]); 
+	cpu.reset();
+	cpu.register_a = 0x02;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0xFE);
+	assert_eq!(cpu.status, 0x80);
+    }
+
+    #[test]
+    fn test_0xe9_sbc_overflow() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xE9, 0x81, 0x00]); 
+	cpu.reset();
+	cpu.register_a = 0x7F;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0xFD);
+	assert_eq!(cpu.status, 0xC0); // overflow flag and negative flag
+    }
+
+    #[test]
+    fn test_0xe9_sbc_overflow_with_carry() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xE9, 0x7F, 0x00]); 
+	cpu.reset();
+	cpu.status = 0x01;
+	cpu.register_a = 0x7E;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0xFF);
+	assert_eq!(cpu.status, 0x80); // overflow flag and negative flag
+    }
+
+
+
+
+
+
+    
     
     // AND
     #[test]
@@ -466,4 +542,5 @@ mod test {
         assert_eq!(cpu.register_x, 0xC1)
     }
 
+    
 }
