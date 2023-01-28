@@ -124,6 +124,35 @@ impl CPU {
     }
 
     fn adc(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	// sum result
+	let result = self.register_a as u16
+	    + value as u16
+	    + (if self.status & 0x01 == 0x01 {
+		1
+	    } else {
+		0
+	    }) as u16;
+	
+	// 0xFFより大きければキャリーは立つ
+	let carry = result > 0xFF;
+	if carry {
+	    self.status |= 0x01; // 0b 0000,0001
+	} else {
+	    self.status &= 0xFE; // 0b 1111,1110
+	}
+
+	let tmp = result as u8;
+
+	// overflow check
+	if (value ^ tmp) & (tmp ^ self.register_a) & 0x80 != 0 {
+	    self.status |= 0x40; // 0b 0100,0000 overflow flag
+	} else {
+	    self.status &= 0xBF; // 0b 1011,1111
+	}
+	
+	self.set_register_a(tmp);
     }
 
     fn set_register_a(&mut self, value: u8) {
@@ -205,11 +234,14 @@ impl CPU {
 	    let opcode = opcodes.get(&code).expect(&format!("OpCode {:x} is not recognized", code));
 
 	    match code {
+		// ADC (Add with Carry)
+		0x69 | 0x65 | 0x75 | 0x6D | 0x7D | 0x79 | 0x61 | 0x71 => {
+		    self.adc(&opcode.mode);
+		}		
 		// AND (Logical AND)
 		0x29 | 0x25 | 0x35 | 0x2D | 0x3D | 0x39 | 0x21 | 0x31 => {
 		    self.and(&opcode.mode);
 		}
-		
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
@@ -239,6 +271,62 @@ impl CPU {
 #[cfg(test)]
 mod test {
     use super::*;
+    // ADC
+    #[test]
+    fn test_0x69_adc_immediate() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x69, 0x10, 0x00]); 
+	cpu.reset();
+	cpu.register_a = 0x01;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x11);
+    }
+
+    #[test]
+    fn test_0x69_adc_calc_with_carry() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x69, 0x10, 0x00]); 
+	cpu.reset();
+	cpu.status = 0x01; // carry flag
+	cpu.register_a = 0x01;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x12);
+    }
+
+    #[test]
+    fn test_0x69_adc_set_carry() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x69, 0xFF, 0x00]); 
+	cpu.reset();
+	cpu.register_a = 0x02;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x01);
+	assert_eq!(cpu.status, 0x01);
+    }
+
+    #[test]
+    fn test_0x69_adc_overflow() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x69, 0x7F, 0x00]); 
+	cpu.reset();
+	cpu.register_a = 0x01;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x80);
+	assert_eq!(cpu.status, 0xC0); // overflow flag and negative flag
+    }
+
+    #[test]
+    fn test_0x69_adc_overflow_with_carry() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x69, 0x7F, 0x00]); 
+	cpu.reset();
+	cpu.status = 0x01;
+	cpu.register_a = 0x01;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x81);
+	assert_eq!(cpu.status, 0xC0); // overflow flag and negative flag
+    }
+    
     // AND
     #[test]
     fn test_0x29_and_immediate() {
