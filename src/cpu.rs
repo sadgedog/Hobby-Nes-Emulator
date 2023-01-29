@@ -119,7 +119,6 @@ impl CPU {
 	    AddressingMode::NoneAddressing => {
 		panic!("mode {:?} is not supported", mode);
 	    }
-	    
 	}
     }
     
@@ -151,6 +150,11 @@ impl CPU {
 	
 	self.set_register_a(tmp);
     }
+
+    fn set_register_a(&mut self, value: u8) {
+	self.register_a = value;
+	self.update_zero_and_negative_flags(self.register_a);
+    }
     
     fn adc(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
@@ -164,15 +168,25 @@ impl CPU {
 	self.add_to_register_a(((value as i8).wrapping_neg().wrapping_sub(1)) as u8);
     }
 
-    fn set_register_a(&mut self, value: u8) {
-	self.register_a = value;
-	self.update_zero_and_negative_flags(self.register_a);
-    }
-
     fn and(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
 	self.set_register_a(value & self.register_a);
+    }
+
+    fn asl(&mut self, mode: &AddressingMode) -> u8{
+	let addr = self.get_operand_address(&mode);
+	let mut data = self.mem_read(addr);
+	// 7bitが設定されている場合
+	if data >> 7 == 1 {
+	    self.status |= 0x01; // set carry flag
+	} else {
+	    self.status |= !0x01; // remove carry flag
+	}
+	data = data << 1;
+	self.mem_write(addr, data);
+	self.update_zero_and_negative_flags(data);
+	data
     }
 
     fn lda(&mut self, mode: &AddressingMode) {
@@ -254,6 +268,10 @@ impl CPU {
 		// AND (Logical AND)
 		0x29 | 0x25 | 0x35 | 0x2D | 0x3D | 0x39 | 0x21 | 0x31 => {
 		    self.and(&opcode.mode);
+		}
+		// ASL (Arithmetic Shift Left)
+		0x0A | 0x06 | 0x16 | 0x0E | 0x1E => {
+		    self.asl(&opcode.mode);
 		}
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
@@ -396,13 +414,6 @@ mod test {
 	assert_eq!(cpu.status, 0x80); // overflow flag and negative flag
     }
 
-
-
-
-
-
-    
-    
     // AND
     #[test]
     fn test_0x29_and_immediate() {
@@ -412,6 +423,27 @@ mod test {
 	cpu.register_a = 0xF3;            // F3 => 11110011
 	cpu.run();
 	assert_eq!(cpu.register_a, 0xA2); // A2 => 10100010
+    }
+    
+    // ASL
+    // #[test]
+    // fn test_0x0a_asl_accumulator() {
+    // 	let mut cpu = CPU::new();
+    // 	cpu.load(vec![0x0A, 0x00]);
+    // 	cpu.reset();
+    // 	cpu.register_a = 0x03;
+    // 	cpu.run();
+    // 	assert_eq!(cpu.register_a, 0x03 * 2);
+    // }
+    
+    #[test]
+    fn test_0x06_asl_zero_page() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x06, 0x01, 0x00]);
+	cpu.reset();
+	cpu.mem_write(0x0001, 0x03);
+	cpu.run();
+	assert_eq!(cpu.mem_read(0x0001), 0x03 * 2);
     }
     
     // LDA
