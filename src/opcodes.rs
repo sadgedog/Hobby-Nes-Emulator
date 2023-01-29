@@ -31,15 +31,6 @@ lazy_static! {
 	OpCode::new(0x79, "ADC", 3, 4, AddressingMode::Absolute_Y),
 	OpCode::new(0x61, "ADC", 2, 6, AddressingMode::Indirect_X),
 	OpCode::new(0x71, "ADC", 2, 5, AddressingMode::Indirect_Y),
-
-	OpCode::new(0xE9, "SBC", 2, 2, AddressingMode::Immediate),
-	OpCode::new(0xE5, "SBC", 2, 3, AddressingMode::ZeroPage),
-	OpCode::new(0xF5, "SBC", 2, 4, AddressingMode::ZeroPage_X),
-	OpCode::new(0xED, "SBC", 3, 4, AddressingMode::Absolute),
-	OpCode::new(0xFD, "SBC", 3, 4, AddressingMode::Absolute_X),
-	OpCode::new(0xF9, "SBC", 3, 4, AddressingMode::Absolute_Y),
-	OpCode::new(0xE1, "SBC", 2, 6, AddressingMode::Indirect_X),
-	OpCode::new(0xF1, "SBC", 2, 5, AddressingMode::Indirect_Y),
 	
 	OpCode::new(0x29, "AND", 2, 2, AddressingMode::Immediate),
 	OpCode::new(0x25, "AND", 2, 3, AddressingMode::ZeroPage),
@@ -55,9 +46,24 @@ lazy_static! {
 	OpCode::new(0x16, "ASL", 2, 6, AddressingMode::ZeroPage_X),
 	OpCode::new(0x0E, "ASL", 3, 6, AddressingMode::Absolute),
 	OpCode::new(0x1E, "ASL", 3, 7, AddressingMode::Absolute_X),
+
+	OpCode::new(0x90, "BCC", 2, 2, AddressingMode::NoneAddressing),
+	
+	OpCode::new(0xB0, "BCS", 2, 2, AddressingMode::NoneAddressing),
+
+	OpCode::new(0xF0, "BEQ", 2, 2, AddressingMode::NoneAddressing),
+
+	OpCode::new(0x24, "BIT", 2, 3, AddressingMode::ZeroPage),
+	OpCode::new(0x2C, "BIT", 2, 4, AddressingMode::Absolute),
+
+	OpCode::new(0x30, "BMI", 2, 2, AddressingMode::NoneAddressing),
+
+	OpCode::new(0xD0, "BNE", 2, 2, AddressingMode::NoneAddressing),
+
+	OpCode::new(0xD0, "BPL", 2, 2, AddressingMode::NoneAddressing),
 	
 	OpCode::new(0x00, "BRK", 1, 7, AddressingMode::NoneAddressing),
-	OpCode::new(0xAA, "TAX", 1, 2, AddressingMode::NoneAddressing),
+
 	OpCode::new(0xE8, "INX", 1, 2, AddressingMode::NoneAddressing),
 
 	OpCode::new(0xA9, "LDA", 2, 2, AddressingMode::Immediate),
@@ -69,6 +75,15 @@ lazy_static! {
 	OpCode::new(0xA1, "LDA", 2, 6, AddressingMode::Indirect_X),
 	OpCode::new(0xB1, "LDA", 2, 5, AddressingMode::Indirect_Y),
 
+	OpCode::new(0xE9, "SBC", 2, 2, AddressingMode::Immediate),
+	OpCode::new(0xE5, "SBC", 2, 3, AddressingMode::ZeroPage),
+	OpCode::new(0xF5, "SBC", 2, 4, AddressingMode::ZeroPage_X),
+	OpCode::new(0xED, "SBC", 3, 4, AddressingMode::Absolute),
+	OpCode::new(0xFD, "SBC", 3, 4, AddressingMode::Absolute_X),
+	OpCode::new(0xF9, "SBC", 3, 4, AddressingMode::Absolute_Y),
+	OpCode::new(0xE1, "SBC", 2, 6, AddressingMode::Indirect_X),
+	OpCode::new(0xF1, "SBC", 2, 5, AddressingMode::Indirect_Y),
+
 	OpCode::new(0x85, "STA", 2, 3, AddressingMode::ZeroPage),
 	OpCode::new(0x95, "STA", 2, 4, AddressingMode::ZeroPage_X),
 	OpCode::new(0x8D, "STA", 3, 4, AddressingMode::Absolute),
@@ -76,6 +91,8 @@ lazy_static! {
 	OpCode::new(0x99, "STA", 3, 5, AddressingMode::Absolute_Y),
 	OpCode::new(0x81, "STA", 2, 6, AddressingMode::Indirect_X),
 	OpCode::new(0x01, "STA", 2, 6, AddressingMode::Indirect_Y),
+
+	OpCode::new(0xAA, "TAX", 1, 2, AddressingMode::NoneAddressing),
     ];
     
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {

@@ -274,15 +274,11 @@ impl CPU {
 		0x69 | 0x65 | 0x75 | 0x6D | 0x7D | 0x79 | 0x61 | 0x71 => {
 		    self.adc(&opcode.mode);
 		}
-		// SBC (Sbstract with Carry)
-		0xE9 | 0xE5 | 0xF5 | 0xED | 0xFD | 0xF9 | 0xE1 | 0xF1 => {
-		    self.sbc(&opcode.mode);
-		}
 		// AND (Logical AND)
 		0x29 | 0x25 | 0x35 | 0x2D | 0x3D | 0x39 | 0x21 | 0x31 => {
 		    self.and(&opcode.mode);
 		}
-		// ASL (Arithmetic Shift Left Accumulator)
+		// ASL (Arithmetic Shift Left Accumulator) Accumulatorはopecodeのみなので分ける
 		0x0A => self.asl_accumulator(),
 		// ASL (Arithmetic Shift Left other)
 		0x06 | 0x16 | 0x0E | 0x1E => {
@@ -291,6 +287,10 @@ impl CPU {
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
+		}
+		// SBC (Sbstract with Carry)
+		0xE9 | 0xE5 | 0xF5 | 0xED | 0xFD | 0xF9 | 0xE1 | 0xF1 => {
+		    self.sbc(&opcode.mode);
 		}
 		// STA (Store Accumulator)
 		0x85 | 0x95 | 0x8D | 0x9D | 0x99 | 0x81 | 0x91 => {
@@ -373,62 +373,6 @@ mod test {
 	assert_eq!(cpu.status, 0xC0); // overflow flag and negative flag
     }
 
-    // SBC A-M-(1-C)
-    #[test]
-    fn test_0xe9_sbc_immediate() {
-	let mut cpu = CPU::new();
-	cpu.load(vec![0xE9, 0x01, 0x00]); 
-	cpu.reset();
-	cpu.register_a = 0x10;
-	cpu.run();
-	assert_eq!(cpu.register_a, 0x0E);
-    }
-
-    #[test]
-    fn test_0xe9_sbc_calc_with_carry() {
-	let mut cpu = CPU::new();
-	cpu.load(vec![0xE9, 0x10, 0x00]); 
-	cpu.reset();
-	cpu.status = 0x01; // carry flag
-	cpu.register_a = 0x50;
-	cpu.run();
-	assert_eq!(cpu.register_a, 0x40);
-    }
-
-    #[test]
-    fn test_0xe9_sbc_set_carry() {
-	let mut cpu = CPU::new();
-	cpu.load(vec![0xE9, 0x03, 0x00]); 
-	cpu.reset();
-	cpu.register_a = 0x02;
-	cpu.run();
-	assert_eq!(cpu.register_a, 0xFE);
-	assert_eq!(cpu.status, 0x80);
-    }
-
-    #[test]
-    fn test_0xe9_sbc_overflow() {
-	let mut cpu = CPU::new();
-	cpu.load(vec![0xE9, 0x81, 0x00]); 
-	cpu.reset();
-	cpu.register_a = 0x7F;
-	cpu.run();
-	assert_eq!(cpu.register_a, 0xFD);
-	assert_eq!(cpu.status, 0xC0); // overflow flag and negative flag
-    }
-
-    #[test]
-    fn test_0xe9_sbc_overflow_with_carry() {
-	let mut cpu = CPU::new();
-	cpu.load(vec![0xE9, 0x7F, 0x00]); 
-	cpu.reset();
-	cpu.status = 0x01;
-	cpu.register_a = 0x7E;
-	cpu.run();
-	assert_eq!(cpu.register_a, 0xFF);
-	assert_eq!(cpu.status, 0x80); // overflow flag and negative flag
-    }
-
     // AND
     #[test]
     fn test_0x29_and_immediate() {
@@ -460,6 +404,39 @@ mod test {
 	cpu.run();
 	assert_eq!(cpu.mem_read(0x0001), 0x03 * 2);
     }
+
+    // BCC
+    // BCS
+    // BEQ
+    // BIT
+    // BMI
+    // BNE
+    // BPL
+    // BRK
+    // BVC
+    // CLC
+    // CLD
+    // CLI
+    // CLV
+    // CMP
+    // CPX
+    // DEC
+    // DEX
+    // DEY
+    // EOR
+    // INC
+    
+    // INX Increment X Register
+    #[test]
+    fn test_inx_overflow() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xA9, 0xFF, 0xAA,0xE8, 0xE8, 0x00]);
+        assert_eq!(cpu.register_x, 1)
+    }
+    
+    // INY
+    // JMP
+    // JSR
     
     // LDA
     #[test]
@@ -555,6 +532,82 @@ mod test {
         assert!(cpu.status & 0b0000_0010 == 0b10);
     }
 
+
+    // LDX
+    // LDY
+    // LSR
+    // NOP
+    // ORA
+    // PHA
+    // PHP
+    // PLA
+    // PLP
+    // ROL
+    // ROR
+    // RTI
+    // RTS
+
+    // SBC A-M-(1-C)
+    #[test]
+    fn test_0xe9_sbc_immediate() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xE9, 0x01, 0x00]); 
+	cpu.reset();
+	cpu.register_a = 0x10;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x0E);
+    }
+
+    #[test]
+    fn test_0xe9_sbc_calc_with_carry() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xE9, 0x10, 0x00]); 
+	cpu.reset();
+	cpu.status = 0x01; // carry flag
+	cpu.register_a = 0x50;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x40);
+    }
+
+    #[test]
+    fn test_0xe9_sbc_set_carry() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xE9, 0x03, 0x00]); 
+	cpu.reset();
+	cpu.register_a = 0x02;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0xFE);
+	assert_eq!(cpu.status, 0x80);
+    }
+
+    #[test]
+    fn test_0xe9_sbc_overflow() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xE9, 0x81, 0x00]); 
+	cpu.reset();
+	cpu.register_a = 0x7F;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0xFD);
+	assert_eq!(cpu.status, 0xC0); // overflow flag and negative flag
+    }
+
+    #[test]
+    fn test_0xe9_sbc_overflow_with_carry() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xE9, 0x7F, 0x00]); 
+	cpu.reset();
+	cpu.status = 0x01;
+	cpu.register_a = 0x7E;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0xFF);
+	assert_eq!(cpu.status, 0x80); // overflow flag and negative flag
+    }
+
+    // SEC
+    // SED
+    // SEI
+
+    // STA
     #[test]
     fn test_0x85_sta_immediate() {
 	let mut cpu = CPU::new();
@@ -565,6 +618,11 @@ mod test {
 	assert_eq!(cpu.mem_read(0xA8), 0x45);
     }
 
+    
+    // STX
+    // STX
+    // STY
+
     // TAX Transfer Accumulator to X
     #[test]
     fn test_0xaa_tax_move_a_to_x() {
@@ -573,13 +631,11 @@ mod test {
         assert_eq!(cpu.register_x, 10)
     }
 
-    // INX Increment X Register
-    #[test]
-    fn test_inx_overflow() {
-        let mut cpu = CPU::new();
-        cpu.load_and_run(vec![0xA9, 0xFF, 0xAA,0xE8, 0xE8, 0x00]);
-        assert_eq!(cpu.register_x, 1)
-    }
+    // TAY
+    // TSX
+    // TXA
+    // TXS
+    // TYA
 
     // other
     #[test]
