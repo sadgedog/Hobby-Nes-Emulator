@@ -228,6 +228,19 @@ impl CPU {
 	}
     }
 
+    fn beq(&mut self) {
+	// ZERO FLAGがセットされている場合
+	// PC += PCアドレスの値+1
+	if self.status & 0x02 == 0x02 {
+	    let branch: i8 = self.mem_read(self.program_counter) as i8;
+	    let branch_addr = self
+		.program_counter.
+		wrapping_add(1).
+		wrapping_add(branch as u16);
+	    self.program_counter = branch_addr;
+	}
+    }
+
     fn lda(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -314,6 +327,8 @@ impl CPU {
 		0x90 => self.bcc(),
 		// BCS (Branch if Carry Set)
 		0xB0 => self.bcs(),
+		// BEQ (Branch if Equal)
+		0xF0 => self.beq(),
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
@@ -458,7 +473,17 @@ mod test {
 	cpu.run();
 	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
     }
+    
     // BEQ
+    #[test]
+    fn test_0xf0_beq_relative() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xB0, 0x00]);
+	cpu.reset();
+	cpu.status = 0x02; // zero flag
+	cpu.run();
+	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
+    }
     // BIT
     // BMI
     // BNE
