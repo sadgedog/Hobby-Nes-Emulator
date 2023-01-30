@@ -202,6 +202,19 @@ impl CPU {
 	data
     }
 
+    fn bcc(&mut self) {
+	// CARRY FLAGがセットされている場合
+	// PC += PCアドレスの値+1
+	if self.status & 0x01 == 0x01 {
+	    let branch: i8 = self.mem_read(self.program_counter) as i8;
+	    let branch_addr = self
+		.program_counter.
+		wrapping_add(1).
+		wrapping_add(branch as u16);
+	    self.program_counter = branch_addr;
+	}
+    }
+
     fn lda(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -254,7 +267,7 @@ impl CPU {
 	self.register_a = 0;
 	self.register_x = 0;
 	self.status = 0;
-	// 0xFFFC, 0xFFFDにはloadの時点で0x00,0x800つまり0x8000が入っているはず
+	// 0xFFFC, 0xFFFDにはloadの時点で0x00,0x80つまり0x8000が入っているはず
 	self.program_counter = self.mem_read_u16(0xFFFC);
     }
     
@@ -284,6 +297,8 @@ impl CPU {
 		0x06 | 0x16 | 0x0E | 0x1E => {
 		    self.asl(&opcode.mode);
 		}
+		// BCC (Branch if Carry Clear)
+		0x90 => self.bcc(),
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
@@ -406,6 +421,19 @@ mod test {
     }
 
     // BCC
+    #[test]
+    fn test_0x90_bcc_relative() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x90, 0x00]);
+	cpu.reset();
+	cpu.run();
+	// PCの初期値は0x8000
+	// 0x90, 0x00で1++
+	// 0x90の中で1++
+	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
+    }
+
+    
     // BCS
     // BEQ
     // BIT
