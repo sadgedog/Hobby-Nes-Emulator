@@ -14,7 +14,7 @@ TODO LIST:
 ADC ✅
 AND ✅
 ASL ✅
-BCC
+BCC ✅
 BCS
 BEQ
 BIT
