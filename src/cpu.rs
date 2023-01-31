@@ -241,6 +241,21 @@ impl CPU {
 	}
     }
 
+    fn bit(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	let tmp = self.register_a & value;
+	if tmp == 0 {
+	    self.status |= 0x40; // zero flag
+	} else {
+	    self.status &= !0x40;
+	}
+	let v7_bit = value & 0b01000000;
+	let v6_bit = value & 0b10000000;
+	self.status |= v7_bit;
+	self.status |= v6_bit;	
+    }
+
     fn lda(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -329,6 +344,10 @@ impl CPU {
 		0xB0 => self.bcs(),
 		// BEQ (Branch if Equal)
 		0xF0 => self.beq(),
+		// BIT
+		0x24 | 0x2C => {
+		    self.bit(&opcode.mode);
+		}
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
@@ -484,7 +503,19 @@ mod test {
 	cpu.run();
 	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
     }
+    
     // BIT
+    #[test]
+    fn test_0x24_bit_zeropage() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x24, 0x01, 0x00]);
+	cpu.reset();
+	cpu.mem_write(0x01, 0b11000000);
+	cpu.register_a = 0b00000001; // 0b11000000 & 0b00000001 = 0 -> zeroflag up
+	cpu.run();
+	assert_eq!(cpu.status, 0b11000000);
+    }
+    
     // BMI
     // BNE
     // BPL
