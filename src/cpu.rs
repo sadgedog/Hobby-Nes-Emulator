@@ -241,6 +241,7 @@ impl CPU {
 	}
     }
 
+    // あってるか不安
     fn bit(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -510,7 +511,18 @@ mod test {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0x24, 0x01, 0x00]);
 	cpu.reset();
-	cpu.mem_write(0x01, 0b11000000);
+	cpu.mem_write_u16(0x01, 0b11000000);
+	cpu.register_a = 0b00000001; // 0b11000000 & 0b00000001 = 0 -> zeroflag up
+	cpu.run();
+	assert_eq!(cpu.status, 0b11000000);
+    }
+
+    #[test]
+    fn test_0x2c_bit_absolute() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x2C, 0x04, 0x80, 0x00]);
+	cpu.reset();
+	cpu.mem_write_u16(0x8004, 0b11000000);
 	cpu.register_a = 0b00000001; // 0b11000000 & 0b00000001 = 0 -> zeroflag up
 	cpu.run();
 	assert_eq!(cpu.status, 0b11000000);
