@@ -18,7 +18,7 @@ ASL ✅
 BCC ✅
 BCS ✅
 BEQ ✅
-BIT
+BIT ✅
 BMI
 BNE
 BPL
