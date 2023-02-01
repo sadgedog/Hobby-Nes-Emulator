@@ -60,7 +60,7 @@ lazy_static! {
 
 	OpCode::new(0xD0, "BNE", 2, 2, AddressingMode::NoneAddressing),
 
-	OpCode::new(0xD0, "BPL", 2, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0x10, "BPL", 2, 2, AddressingMode::NoneAddressing),
 	
 	OpCode::new(0x00, "BRK", 1, 7, AddressingMode::NoneAddressing),
 

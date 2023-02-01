@@ -292,6 +292,17 @@ impl CPU {
 	}
     }
 
+    fn bpl(&mut self) {
+	if self.status & NEGATIVE_FLAG == CLEAR_STATUS {
+	    let branch: i8 = self.mem_read(self.program_counter) as i8;
+	    let branch_addr = self
+		.program_counter.
+		wrapping_add(1).
+		wrapping_add(branch as u16);
+	    self.program_counter = branch_addr;
+	}
+    }
+
     fn lda(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -388,6 +399,8 @@ impl CPU {
 		0x30 => self.bmi(),
 		// BNE (Branch if Not Equal)
 		0xD0 => self.bne(),
+		// BPL (Branch if Positive)
+		0x10 => self.bpl(),
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
@@ -520,8 +533,7 @@ mod test {
 	// 0x90, 0x00で1++
 	// 0x90の中で1++
 	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
-    }
-    
+    }   
     // BCS
     #[test]
     fn test_0xb0_bcs_relative() {
@@ -531,8 +543,7 @@ mod test {
 	cpu.status = 0x01; // carry flag
 	cpu.run();
 	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
-    }
-    
+    }    
     // BEQ
     #[test]
     fn test_0xf0_beq_relative() {
@@ -542,8 +553,7 @@ mod test {
 	cpu.status = 0x02; // zero flag
 	cpu.run();
 	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
-    }
-    
+    }    
     // BIT
     #[test]
     fn test_0x24_bit_zeropage() {
@@ -555,7 +565,6 @@ mod test {
 	cpu.run();
 	assert_eq!(cpu.status, 0b1100_0010);
     }
-
     #[test]
     fn test_0x2c_bit_absolute() {
 	let mut cpu = CPU::new();
@@ -565,8 +574,7 @@ mod test {
 	cpu.register_a = 0b000_00001; // 0b11000000 & 0b00000001 = 0 -> zeroflag up
 	cpu.run();
 	assert_eq!(cpu.status, 0b1100_0010);
-    }
-    
+    }    
     // BMI
     #[test]
     fn test_0x30_bmi_relative() {
@@ -588,6 +596,15 @@ mod test {
 	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
     }
     // BPL
+    #[test]
+    fn test_0x10_bpl_relative() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x10, 0x00]);
+	cpu.reset();
+	cpu.status = !NEGATIVE_FLAG;
+	cpu.run();
+	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
+    }
     // BRK
     // BVC
     // CLC
@@ -819,7 +836,5 @@ mod test {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xA9, 0xC0, 0xAA, 0xE8, 0x00]);
         assert_eq!(cpu.register_x, 0xC1)
-    }
-
-    
+    }    
 }
