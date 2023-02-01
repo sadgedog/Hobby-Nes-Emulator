@@ -19,9 +19,9 @@ BCC ✅
 BCS ✅
 BEQ ✅
 BIT ✅
-BMI
-BNE
-BPL
+BMI ✅
+BNE ✅
+BPL ✅
 BRK ✅
 BVC
 BVS
