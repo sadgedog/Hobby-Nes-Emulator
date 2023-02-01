@@ -10,6 +10,8 @@ pub struct CPU {
     memory: [u8; 0xFFFF]
 }
 
+// 必要ないけどなんとなく
+const CLEAR_STATUS: u8      = 0b0000_0000;
 // Processor Status
 const CARRY_FLAG: u8        = 0b0000_0001;
 const ZERO_FLAG: u8         = 0b0000_0010;
@@ -152,7 +154,7 @@ impl CPU {
 	let tmp = result as u8;
 
 	// overflow check
-	if (value ^ tmp) & (tmp ^ self.register_a) & 0x80 != 0 {
+	if (value ^ tmp) & (tmp ^ self.register_a) & NEGATIVE_FLAG != 0 {
 	    self.status |= OVERFLOW_FLAG; // 0b 0100,0000 overflow flag
 	} else {
 	    self.status &= !OVERFLOW_FLAG; // 0b 1011,1111
@@ -269,7 +271,18 @@ impl CPU {
 
     fn bmi(&mut self) {
 	// negative flag
-	if self.status & 0x80 == 0x80 {
+	if self.status & NEGATIVE_FLAG == NEGATIVE_FLAG {
+	    let branch: i8 = self.mem_read(self.program_counter) as i8;
+	    let branch_addr = self
+		.program_counter.
+		wrapping_add(1).
+		wrapping_add(branch as u16);
+	    self.program_counter = branch_addr;
+	}
+    }
+
+    fn bne(&mut self) {
+	if self.status & ZERO_FLAG == CLEAR_STATUS {
 	    let branch: i8 = self.mem_read(self.program_counter) as i8;
 	    let branch_addr = self
 		.program_counter.
@@ -373,6 +386,8 @@ impl CPU {
 		}
 		// BMI (Branch if Minus)
 		0x30 => self.bmi(),
+		// BNE (Branch if Not Equal)
+		0xD0 => self.bne(),
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
@@ -563,6 +578,15 @@ mod test {
 	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
     }
     // BNE
+    #[test]
+    fn test_0xD0_bne_relative() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xD0, 0x00]);
+	cpu.reset();
+	cpu.status = !ZERO_FLAG;
+	cpu.run();
+	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
+    }
     // BPL
     // BRK
     // BVC
