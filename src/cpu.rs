@@ -10,6 +10,16 @@ pub struct CPU {
     memory: [u8; 0xFFFF]
 }
 
+// Processor Status
+const CARRY_FLAG: u8        = 0b0000_0001;
+const ZERO_FLAG: u8         = 0b0000_0010;
+const INTERRUPT_DISABLE: u8 = 0b0000_0100;
+const DECIMAL_MODE_FLAG:u8  = 0b0000_1000;
+const BREAK_COMMAND:u8     = 0b0001_0000;
+const BREAK2_COMMAND:u8    = 0b0010_0000;
+const OVERFLOW_FLAG:u8     = 0b0100_0000;
+const NEGATIVE_FLAG:u8     = 0b1000_0000;
+
 #[derive(Debug)]
 #[allow(non_camel_case_types)]
 pub enum AddressingMode {
@@ -125,7 +135,7 @@ impl CPU {
     fn add_to_register_a(&mut self, value: u8) {
 	let result = self.register_a as u16
 	    + value as u16
-	    + (if self.status & 0x01 == 0x01 {
+	    + (if self.status & CARRY_FLAG == CARRY_FLAG {
 		1
 	    } else {
 		0
@@ -134,18 +144,18 @@ impl CPU {
 	// 0xFFより大きければキャリーは立つ
 	let carry = result > 0xFF;
 	if carry {
-	    self.status |= 0x01; // 0b 0000,0001
+	    self.status |= CARRY_FLAG; // 0b 0000,0001
 	} else {
-	    self.status &= 0xFE; // 0b 1111,1110
+	    self.status &= !CARRY_FLAG; // 0b 1111,1110
 	}
 
 	let tmp = result as u8;
 
 	// overflow check
 	if (value ^ tmp) & (tmp ^ self.register_a) & 0x80 != 0 {
-	    self.status |= 0x40; // 0b 0100,0000 overflow flag
+	    self.status |= OVERFLOW_FLAG; // 0b 0100,0000 overflow flag
 	} else {
-	    self.status &= 0xBF; // 0b 1011,1111
+	    self.status &= !OVERFLOW_FLAG; // 0b 1011,1111
 	}
 	
 	self.set_register_a(tmp);
@@ -178,9 +188,9 @@ impl CPU {
 	let mut data = self.register_a;
 	// 7bitが設定されている場合
 	if data >> 7 == 1 {
-	    self.status |= 0x01; // set carry flag
+	    self.status |= CARRY_FLAG; // set carry flag
 	} else {
-	    self.status |= !0x01; // remove carry flag
+	    self.status |= !CARRY_FLAG; // remove carry flag
 	}
 	data = data << 1;
 	self.register_a = data;
@@ -192,9 +202,9 @@ impl CPU {
 	let mut data = self.mem_read(addr);
 	// 7bitが設定されている場合
 	if data >> 7 == 1 {
-	    self.status |= 0x01; // set carry flag
+	    self.status |= CARRY_FLAG; // set carry flag
 	} else {
-	    self.status |= !0x01; // remove carry flag
+	    self.status |= !CARRY_FLAG; // remove carry flag
 	}
 	data = data << 1;
 	self.mem_write(addr, data);
@@ -205,7 +215,7 @@ impl CPU {
     fn bcc(&mut self) {
 	// CARRY FLAGがセットされていない場合
 	// PC += PCアドレスの値+1
-	if self.status & 0x01 != 0x01 {
+	if self.status & CARRY_FLAG != CARRY_FLAG {
 	    let branch: i8 = self.mem_read(self.program_counter) as i8;
 	    let branch_addr = self
 		.program_counter.
@@ -218,7 +228,7 @@ impl CPU {
     fn bcs(&mut self) {
 	// CARRY FLAGがセットされている場合
 	// PC += PCアドレスの値+1
-	if self.status & 0x01 == 0x01 {
+	if self.status & CARRY_FLAG == CARRY_FLAG {
 	    let branch: i8 = self.mem_read(self.program_counter) as i8;
 	    let branch_addr = self
 		.program_counter.
@@ -231,7 +241,7 @@ impl CPU {
     fn beq(&mut self) {
 	// ZERO FLAGがセットされている場合
 	// PC += PCアドレスの値+1
-	if self.status & 0x02 == 0x02 {
+	if self.status & ZERO_FLAG == ZERO_FLAG {
 	    let branch: i8 = self.mem_read(self.program_counter) as i8;
 	    let branch_addr = self
 		.program_counter.
@@ -247,14 +257,26 @@ impl CPU {
 	let value = self.mem_read(addr);
 	let tmp = self.register_a & value;
 	if tmp == 0 {
-	    self.status |= 0x40; // zero flag
+	    self.status |= ZERO_FLAG; // zero flag
 	} else {
-	    self.status &= !0x40;
+	    self.status &= !ZERO_FLAG;
 	}
-	let v7_bit = value & 0b01000000;
-	let v6_bit = value & 0b10000000;
+	let v7_bit = value & NEGATIVE_FLAG;
+	let v6_bit = value & OVERFLOW_FLAG;
 	self.status |= v7_bit;
 	self.status |= v6_bit;	
+    }
+
+    fn bmi(&mut self) {
+	// negative flag
+	if self.status & 0x80 == 0x80 {
+	    let branch: i8 = self.mem_read(self.program_counter) as i8;
+	    let branch_addr = self
+		.program_counter.
+		wrapping_add(1).
+		wrapping_add(branch as u16);
+	    self.program_counter = branch_addr;
+	}
     }
 
     fn lda(&mut self, mode: &AddressingMode) {
@@ -277,15 +299,15 @@ impl CPU {
 
     fn update_zero_and_negative_flags(&mut self, result: u8) {
 	if result == 0 {
-	    self.status = self.status | 0b0000_0010;
+	    self.status = self.status | ZERO_FLAG;
 	} else {
-	    self.status = self.status & 0b1111_1101;
+	    self.status = self.status & !ZERO_FLAG;
 	}
 
 	if result & 0b1000_0000 != 0 {
-	    self.status = self.status | 0b1000_0000;
+	    self.status = self.status | NEGATIVE_FLAG;
 	} else {
-	    self.status = self.status & 0b0111_1111;
+	    self.status = self.status & !NEGATIVE_FLAG;
 	}
     }
 
@@ -345,10 +367,12 @@ impl CPU {
 		0xB0 => self.bcs(),
 		// BEQ (Branch if Equal)
 		0xF0 => self.beq(),
-		// BIT
+		// BIT (Bit Test)
 		0x24 | 0x2C => {
 		    self.bit(&opcode.mode);
 		}
+		// BMI (Branch if Minus)
+		0x30 => self.bmi(),
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
@@ -511,10 +535,10 @@ mod test {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0x24, 0x01, 0x00]);
 	cpu.reset();
-	cpu.mem_write_u16(0x01, 0b11000000);
-	cpu.register_a = 0b00000001; // 0b11000000 & 0b00000001 = 0 -> zeroflag up
+	cpu.mem_write_u16(0x01, 0b1100_0000);
+	cpu.register_a = 0b0000_0001; // 0b11000000 & 0b00000001 = 0 -> zeroflag up
 	cpu.run();
-	assert_eq!(cpu.status, 0b11000000);
+	assert_eq!(cpu.status, 0b1100_0010);
     }
 
     #[test]
@@ -522,13 +546,22 @@ mod test {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0x2C, 0x04, 0x80, 0x00]);
 	cpu.reset();
-	cpu.mem_write_u16(0x8004, 0b11000000);
-	cpu.register_a = 0b00000001; // 0b11000000 & 0b00000001 = 0 -> zeroflag up
+	cpu.mem_write_u16(0x8004, 0b1100_0000);
+	cpu.register_a = 0b000_00001; // 0b11000000 & 0b00000001 = 0 -> zeroflag up
 	cpu.run();
-	assert_eq!(cpu.status, 0b11000000);
+	assert_eq!(cpu.status, 0b1100_0010);
     }
     
     // BMI
+    #[test]
+    fn test_0x30_bmi_relative() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x30, 0x00]);
+	cpu.reset();
+	cpu.status = 0x80; // zero flag
+	cpu.run();
+	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
+    }
     // BNE
     // BPL
     // BRK
