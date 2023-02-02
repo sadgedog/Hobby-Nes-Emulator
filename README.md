@@ -12,6 +12,7 @@ https://www.nesdev.org/obelisk-6502-guide/reference.html
 cargo test -- --nocapture
 
 TODO LIST:
+
 ADC ✅	\
 AND ✅	\
 ASL ✅	\

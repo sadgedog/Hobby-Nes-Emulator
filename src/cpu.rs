@@ -303,6 +303,20 @@ impl CPU {
 	}
     }
 
+    // fn brk(&mut self) {
+    // }
+
+    fn bvc(&mut self) {
+	if self.status & OVERFLOW_FLAG == CLEAR_STATUS {
+	    let branch: i8 = self.mem_read(self.program_counter) as i8;
+	    let branch_addr = self
+		.program_counter.
+		wrapping_add(1).
+		wrapping_add(branch as u16);
+	    self.program_counter = branch_addr;
+	}
+    }
+
     fn lda(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -401,6 +415,10 @@ impl CPU {
 		0xD0 => self.bne(),
 		// BPL (Branch if Positive)
 		0x10 => self.bpl(),
+		// BRK (Force Interrupt)
+		0x00 => return,
+		// BVC (Branch if Overflow Clear)
+		0x50 => self.bvc(),
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
@@ -417,8 +435,6 @@ impl CPU {
 		0xAA => self.tax(),
 		// INX
 		0xE8 => self.inx(),
-		// BRK (Force Interrupt)
-		0x00 => return,
 		
 		_ => todo!(),
 	    }
@@ -587,7 +603,7 @@ mod test {
     }
     // BNE
     #[test]
-    fn test_0xD0_bne_relative() {
+    fn test_0xd0_bne_relative() {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0xD0, 0x00]);
 	cpu.reset();
@@ -606,7 +622,24 @@ mod test {
 	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
     }
     // BRK
+    #[test]
+    fn test_0x00_brk_implied() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x00]);
+	cpu.reset();
+	cpu.run();
+	assert_eq!(cpu.status, 0x00);
+    }
     // BVC
+    #[test]
+    fn test_0x50_bvc_relative() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x50, 0x00]);
+	cpu.reset();
+	cpu.status = !OVERFLOW_FLAG;
+	cpu.run();
+	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
+    }
     // CLC
     // CLD
     // CLI

@@ -64,6 +64,8 @@ lazy_static! {
 	
 	OpCode::new(0x00, "BRK", 1, 7, AddressingMode::NoneAddressing),
 
+	OpCode::new(0x50, "BVC", 2, 2, AddressingMode::NoneAddressing),
+
 	OpCode::new(0xE8, "INX", 1, 2, AddressingMode::NoneAddressing),
 
 	OpCode::new(0xA9, "LDA", 2, 2, AddressingMode::Immediate),
