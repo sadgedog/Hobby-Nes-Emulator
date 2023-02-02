@@ -24,7 +24,7 @@ BMI ✅	\
 BNE ✅	\
 BPL ✅	\
 BRK ✅	\
-BVC	\
+BVC ✅	\
 BVS	\
 CLC	\
 CLD	\

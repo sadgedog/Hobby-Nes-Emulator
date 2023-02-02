@@ -292,6 +292,12 @@ impl CPU {
 	}
     }
 
+    fn bvs(&mut self) {
+	if self.status & OVERFLOW_FLAG == OVERFLOW_FLAG {
+	    self.branch();
+	}
+    }
+
     fn lda(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -394,6 +400,8 @@ impl CPU {
 		0x00 => return,
 		// BVC (Branch if Overflow Clear)
 		0x50 => self.bvc(),
+		// BVS (Branch if Overflow Set)
+		0x70 => self.bvs(),
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
@@ -612,6 +620,16 @@ mod test {
 	cpu.load(vec![0x50, 0x00]);
 	cpu.reset();
 	cpu.status = !OVERFLOW_FLAG;
+	cpu.run();
+	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
+    }
+    // BVS
+    #[test]
+    fn test_0x70_bvs_relative() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x70, 0x00]);
+	cpu.reset();
+	cpu.status = OVERFLOW_FLAG;
 	cpu.run();
 	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
     }
