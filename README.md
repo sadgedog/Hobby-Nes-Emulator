@@ -25,11 +25,11 @@ BNE ✅	\
 BPL ✅	\
 BRK ✅	\
 BVC ✅	\
-BVS	\
-CLC	\
-CLD	\
-CLI	\
-CLV	\
+BVS ✅	\
+CLC ✅	\
+CLD ✅	\
+CLI ✅	\
+CLV ✅	\
 CMP	\
 CPX	\
 CPY	\

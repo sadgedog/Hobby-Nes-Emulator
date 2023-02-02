@@ -248,7 +248,6 @@ impl CPU {
 	}
     }
 
-    // あってるか不安
     fn bit(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -261,7 +260,7 @@ impl CPU {
 	let v7_bit = value & NEGATIVE_FLAG;
 	let v6_bit = value & OVERFLOW_FLAG;
 	self.status |= v7_bit;
-	self.status |= v6_bit;	
+	self.status |= v6_bit;
     }
 
     fn bmi(&mut self) {
@@ -295,6 +294,33 @@ impl CPU {
     fn bvs(&mut self) {
 	if self.status & OVERFLOW_FLAG == OVERFLOW_FLAG {
 	    self.branch();
+	}
+    }
+
+    fn clc(&mut self) {
+	if self.status & CARRY_FLAG == CARRY_FLAG {
+	    self.status -= 1;
+	}
+	// if self.status % 2 != 0 {
+	//     self.status -= 1;
+	// }
+    }
+
+    fn cld(&mut self) {
+	if self.status & DECIMAL_MODE_FLAG == DECIMAL_MODE_FLAG {
+	    self.status -= DECIMAL_MODE_FLAG;
+	}
+    }
+
+    fn cli(&mut self) {
+	if self.status & INTERRUPT_DISABLE == INTERRUPT_DISABLE {
+	    self.status -= INTERRUPT_DISABLE;
+	}
+    }
+
+    fn clv(&mut self) {
+	if self.status & OVERFLOW_FLAG == OVERFLOW_FLAG {
+	    self.status -= OVERFLOW_FLAG;
 	}
     }
 
@@ -402,6 +428,14 @@ impl CPU {
 		0x50 => self.bvc(),
 		// BVS (Branch if Overflow Set)
 		0x70 => self.bvs(),
+		// CLC (Clear Carry Flag)
+		0x18 => self.clc(),
+		// CLD (Clear Decimal Mode)
+		0xd8 => self.cld(),
+		// CLI (Clear Interruput Disable)
+		0x58 => self.cli(),
+		// clv (Clear Oveflow Flag)
+		0xb8 => self.clv(),
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
@@ -443,7 +477,7 @@ mod test {
 	cpu.run();
 	assert_eq!(cpu.register_a, 0x11);
     }
-
+    
     #[test]
     fn test_0x69_adc_calc_with_carry() {
 	let mut cpu = CPU::new();
@@ -542,7 +576,8 @@ mod test {
 	cpu.status = 0x01; // carry flag
 	cpu.run();
 	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
-    }    
+    }
+    
     // BEQ
     #[test]
     fn test_0xf0_beq_relative() {
@@ -552,7 +587,8 @@ mod test {
 	cpu.status = 0x02; // zero flag
 	cpu.run();
 	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
-    }    
+    }
+    
     // BIT
     #[test]
     fn test_0x24_bit_zeropage() {
@@ -564,6 +600,7 @@ mod test {
 	cpu.run();
 	assert_eq!(cpu.status, 0b1100_0010);
     }
+    
     #[test]
     fn test_0x2c_bit_absolute() {
 	let mut cpu = CPU::new();
@@ -573,7 +610,8 @@ mod test {
 	cpu.register_a = 0b000_00001; // 0b11000000 & 0b00000001 = 0 -> zeroflag up
 	cpu.run();
 	assert_eq!(cpu.status, 0b1100_0010);
-    }    
+    }
+    
     // BMI
     #[test]
     fn test_0x30_bmi_relative() {
@@ -584,6 +622,7 @@ mod test {
 	cpu.run();
 	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
     }
+    
     // BNE
     #[test]
     fn test_0xd0_bne_relative() {
@@ -594,6 +633,7 @@ mod test {
 	cpu.run();
 	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
     }
+    
     // BPL
     #[test]
     fn test_0x10_bpl_relative() {
@@ -604,6 +644,7 @@ mod test {
 	cpu.run();
 	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
     }
+    
     // BRK
     #[test]
     fn test_0x00_brk_implied() {
@@ -613,6 +654,7 @@ mod test {
 	cpu.run();
 	assert_eq!(cpu.status, 0x00);
     }
+    
     // BVC
     #[test]
     fn test_0x50_bvc_relative() {
@@ -623,6 +665,7 @@ mod test {
 	cpu.run();
 	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
     }
+    
     // BVS
     #[test]
     fn test_0x70_bvs_relative() {
@@ -633,10 +676,50 @@ mod test {
 	cpu.run();
 	assert_eq!(cpu.program_counter, 0x8000 + 0x01 * 3);
     }
+    
     // CLC
+    #[test]
+    fn test_0x18_clc_implied() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x18, 0x00]);
+	cpu.reset();
+	cpu.status = CARRY_FLAG;
+	cpu.run();
+	assert_eq!(cpu.status, CLEAR_STATUS);
+    }
+    
     // CLD
+    #[test]
+    fn test_0xd8_cld_implied() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xd8, 0x00]);
+	cpu.reset();
+	cpu.status = DECIMAL_MODE_FLAG;
+	cpu.run();
+	assert_eq!(cpu.status, CLEAR_STATUS);
+    }
+    
     // CLI
+    #[test]
+    fn test_0x58_cli_implied() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x58, 0x00]);
+	cpu.reset();
+	cpu.status = INTERRUPT_DISABLE;
+	cpu.run();
+	assert_eq!(cpu.status, CLEAR_STATUS);
+    }
+    
     // CLV
+    #[test]
+    fn test_0xb8_clv_implied() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xb8, 0x00]);
+	cpu.reset();
+	cpu.status = OVERFLOW_FLAG;
+	cpu.run();
+	assert_eq!(cpu.status, CLEAR_STATUS);
+    }
     // CMP
     // CPX
     // DEC
