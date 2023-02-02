@@ -214,16 +214,21 @@ impl CPU {
 	data
     }
 
+    // Branch opecode (bcc, bcs, ...)
+    fn branch(&mut self) {
+	let branch: i8 = self.mem_read(self.program_counter) as i8;
+	let branch_addr = self
+	    .program_counter.
+	    wrapping_add(1).
+	    wrapping_add(branch as u16);
+	self.program_counter = branch_addr;
+    }
+
     fn bcc(&mut self) {
 	// CARRY FLAGがセットされていない場合
 	// PC += PCアドレスの値+1
 	if self.status & CARRY_FLAG != CARRY_FLAG {
-	    let branch: i8 = self.mem_read(self.program_counter) as i8;
-	    let branch_addr = self
-		.program_counter.
-		wrapping_add(1).
-		wrapping_add(branch as u16);
-	    self.program_counter = branch_addr;
+	    self.branch();
 	}
     }
 
@@ -231,12 +236,7 @@ impl CPU {
 	// CARRY FLAGがセットされている場合
 	// PC += PCアドレスの値+1
 	if self.status & CARRY_FLAG == CARRY_FLAG {
-	    let branch: i8 = self.mem_read(self.program_counter) as i8;
-	    let branch_addr = self
-		.program_counter.
-		wrapping_add(1).
-		wrapping_add(branch as u16);
-	    self.program_counter = branch_addr;
+	    self.branch();
 	}
     }
 
@@ -244,12 +244,7 @@ impl CPU {
 	// ZERO FLAGがセットされている場合
 	// PC += PCアドレスの値+1
 	if self.status & ZERO_FLAG == ZERO_FLAG {
-	    let branch: i8 = self.mem_read(self.program_counter) as i8;
-	    let branch_addr = self
-		.program_counter.
-		wrapping_add(1).
-		wrapping_add(branch as u16);
-	    self.program_counter = branch_addr;
+	    self.branch();
 	}
     }
 
@@ -272,34 +267,19 @@ impl CPU {
     fn bmi(&mut self) {
 	// negative flag
 	if self.status & NEGATIVE_FLAG == NEGATIVE_FLAG {
-	    let branch: i8 = self.mem_read(self.program_counter) as i8;
-	    let branch_addr = self
-		.program_counter.
-		wrapping_add(1).
-		wrapping_add(branch as u16);
-	    self.program_counter = branch_addr;
+	    self.branch();
 	}
     }
 
     fn bne(&mut self) {
 	if self.status & ZERO_FLAG == CLEAR_STATUS {
-	    let branch: i8 = self.mem_read(self.program_counter) as i8;
-	    let branch_addr = self
-		.program_counter.
-		wrapping_add(1).
-		wrapping_add(branch as u16);
-	    self.program_counter = branch_addr;
+	    self.branch();
 	}
     }
 
     fn bpl(&mut self) {
 	if self.status & NEGATIVE_FLAG == CLEAR_STATUS {
-	    let branch: i8 = self.mem_read(self.program_counter) as i8;
-	    let branch_addr = self
-		.program_counter.
-		wrapping_add(1).
-		wrapping_add(branch as u16);
-	    self.program_counter = branch_addr;
+	    self.branch();
 	}
     }
 
@@ -308,12 +288,7 @@ impl CPU {
 
     fn bvc(&mut self) {
 	if self.status & OVERFLOW_FLAG == CLEAR_STATUS {
-	    let branch: i8 = self.mem_read(self.program_counter) as i8;
-	    let branch_addr = self
-		.program_counter.
-		wrapping_add(1).
-		wrapping_add(branch as u16);
-	    self.program_counter = branch_addr;
+	    self.branch();
 	}
     }
 
