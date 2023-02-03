@@ -324,17 +324,32 @@ impl CPU {
 	}
     }
 
+    fn compare(&mut self, cmp_data: u8, value: u8) {
+	if cmp_data == value {
+	    self.status |= ZERO_FLAG;
+	} else if cmp_data >= value {
+	    self.status |= CARRY_FLAG;
+	}
+	let res = cmp_data.wrapping_sub(value);
+	self.update_zero_and_negative_flags(res);
+    }
+
     fn cmp(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
-	if self.register_a == value {
-	    self.status |= ZERO_FLAG;
-	} else if self.register_a >= value {
-	    self.status |= CARRY_FLAG;
-	}
-	let res = self.register_a.wrapping_sub(value);
-	self.update_zero_and_negative_flags(res);
-	
+	self.compare(self.register_a, value);
+    }
+
+    fn cpx(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	self.compare(self.register_x, value);
+    }
+
+    fn cpy(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	self.compare(self.register_y, value);
     }
 
     fn lda(&mut self, mode: &AddressingMode) {
@@ -452,6 +467,14 @@ impl CPU {
 		// CMP (Compare)
 		0xC9 | 0xC5 | 0xD5 | 0xCD | 0xDD | 0xD9 | 0xC1 | 0xD1 => {
 		    self.cmp(&opcode.mode);
+		}
+		// CPX (Compare X Register)
+		0xE0 | 0xE4 | 0xEC => {
+		    self.cpx(&opcode.mode);
+		}
+		// CPY (Compare Y Register)
+		0xC0 | 0xC4 | 0xCC => {
+		    self.cpy(&opcode.mode);
 		}
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
@@ -760,7 +783,7 @@ mod test {
     }
 
     #[test]
-    fn test_0xc9_cmp_immediate_() {
+    fn test_0xc9_cmp_immediate_negflg() {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0xC9, 0x11, 0x00]);
 	cpu.reset();
@@ -768,7 +791,69 @@ mod test {
 	cpu.run();
 	assert_eq!(cpu.status, NEGATIVE_FLAG | CARRY_FLAG);
     }
+    
     // CPX
+    #[test]
+    fn test_0xe0_cpx_immediate_X_equal_M() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xe0, 0x11, 0x00]);
+	cpu.reset();
+	cpu.register_x = 0x11;
+	cpu.run();
+	assert_eq!(cpu.status, ZERO_FLAG);
+    }
+
+    #[test]
+    fn test_0xe0_cpx_immediate_X_bigger_M() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xe0, 0x11, 0x00]);
+	cpu.reset();
+	cpu.register_x = 0x12;
+	cpu.run();
+	assert_eq!(cpu.status, CARRY_FLAG);
+    }
+
+    #[test]
+    fn test_0xe0_cpx_immediate_negflg() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xe0, 0x11, 0x00]);
+	cpu.reset();
+	cpu.register_x = 0xFF;
+	cpu.run();
+	assert_eq!(cpu.status, CARRY_FLAG | NEGATIVE_FLAG);
+    }
+
+    // CPY
+    #[test]
+    fn test_0xc0_cpy_immediate_Y_equal_M() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xc0, 0x11, 0x00]);
+	cpu.reset();
+	cpu.register_y = 0x11;
+	cpu.run();
+	assert_eq!(cpu.status, ZERO_FLAG);
+    }
+
+    #[test]
+    fn test_0xc0_cpy_immediate_Y_bigger_M() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xc0, 0x11, 0x00]);
+	cpu.reset();
+	cpu.register_y = 0x12;
+	cpu.run();
+	assert_eq!(cpu.status, CARRY_FLAG);
+    }
+
+    #[test]
+    fn test_0xc0_cpy_immediate_negflg() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xc0, 0x11, 0x00]);
+	cpu.reset();
+	cpu.register_y = 0xFF;
+	cpu.run();
+	assert_eq!(cpu.status, CARRY_FLAG | NEGATIVE_FLAG);
+    }
+    
     // DEC
     // DEX
     // DEY

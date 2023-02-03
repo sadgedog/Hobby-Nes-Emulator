@@ -30,9 +30,9 @@ CLC ✅	\
 CLD ✅	\
 CLI ✅	\
 CLV ✅	\
-CMP	\
-CPX	\
-CPY	\
+CMP ✅	\
+CPX ✅	\
+CPY ✅	\
 DEC	\
 DEX	\
 DEY	\
