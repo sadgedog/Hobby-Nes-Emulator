@@ -324,6 +324,19 @@ impl CPU {
 	}
     }
 
+    fn cmp(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	if self.register_a == value {
+	    self.status |= ZERO_FLAG;
+	} else if self.register_a >= value {
+	    self.status |= CARRY_FLAG;
+	}
+	let res = self.register_a.wrapping_sub(value);
+	self.update_zero_and_negative_flags(res);
+	
+    }
+
     fn lda(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -434,8 +447,12 @@ impl CPU {
 		0xd8 => self.cld(),
 		// CLI (Clear Interruput Disable)
 		0x58 => self.cli(),
-		// clv (Clear Oveflow Flag)
+		// CLV (Clear Oveflow Flag)
 		0xb8 => self.clv(),
+		// CMP (Compare)
+		0xC9 | 0xC5 | 0xD5 | 0xCD | 0xDD | 0xD9 | 0xC1 | 0xD1 => {
+		    self.cmp(&opcode.mode);
+		}
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
@@ -714,13 +731,43 @@ mod test {
     #[test]
     fn test_0xb8_clv_implied() {
 	let mut cpu = CPU::new();
-	cpu.load(vec![0xb8, 0x00]);
+	cpu.load(vec![0xB8, 0x00]);
 	cpu.reset();
 	cpu.status = OVERFLOW_FLAG;
 	cpu.run();
 	assert_eq!(cpu.status, CLEAR_STATUS);
     }
+    
     // CMP
+    #[test]
+    fn test_0xc9_cmp_immediate_A_equal_M() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xC9, 0x11, 0x00]);
+	cpu.reset();
+	cpu.register_a = 0x11;
+	cpu.run();
+	assert_eq!(cpu.status, ZERO_FLAG);
+    }
+
+    #[test]
+    fn test_0xc9_cmp_immediate_A_bigger_M() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xC9, 0x11, 0x00]);
+	cpu.reset();
+	cpu.register_a = 0x12;
+	cpu.run();
+	assert_eq!(cpu.status, CARRY_FLAG);
+    }
+
+    #[test]
+    fn test_0xc9_cmp_immediate_() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xC9, 0x11, 0x00]);
+	cpu.reset();
+	cpu.register_a = 0xFF;
+	cpu.run();
+	assert_eq!(cpu.status, NEGATIVE_FLAG | CARRY_FLAG);
+    }
     // CPX
     // DEC
     // DEX
