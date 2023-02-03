@@ -33,7 +33,7 @@ CLV ✅	\
 CMP ✅	\
 CPX ✅	\
 CPY ✅	\
-DEC	\
+DEC ✅	\
 DEX	\
 DEY	\
 EOR	\
