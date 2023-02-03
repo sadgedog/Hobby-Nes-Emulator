@@ -352,6 +352,15 @@ impl CPU {
 	self.compare(self.register_y, value);
     }
 
+    fn dec(&mut self, mode: &AddressingMode) -> u8 {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	let res = value.wrapping_sub(1);
+	self.mem_write(addr, res);
+	self.update_zero_and_negative_flags(res);
+	res
+    }
+
     fn lda(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -475,6 +484,10 @@ impl CPU {
 		// CPY (Compare Y Register)
 		0xC0 | 0xC4 | 0xCC => {
 		    self.cpy(&opcode.mode);
+		}
+		// DEC (Decrement Memory)
+		0xC6 | 0xD6 | 0xCE | 0xDE => {
+		    self.dec(&opcode.mode);
 		}
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
@@ -763,7 +776,7 @@ mod test {
     
     // CMP
     #[test]
-    fn test_0xc9_cmp_immediate_A_equal_M() {
+    fn test_0xc9_cmp_immediate_a_equal_m() {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0xC9, 0x11, 0x00]);
 	cpu.reset();
@@ -773,7 +786,7 @@ mod test {
     }
 
     #[test]
-    fn test_0xc9_cmp_immediate_A_bigger_M() {
+    fn test_0xc9_cmp_immediate_a_bigger_m() {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0xC9, 0x11, 0x00]);
 	cpu.reset();
@@ -794,7 +807,7 @@ mod test {
     
     // CPX
     #[test]
-    fn test_0xe0_cpx_immediate_X_equal_M() {
+    fn test_0xe0_cpx_immediate_x_equal_m() {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0xe0, 0x11, 0x00]);
 	cpu.reset();
@@ -804,7 +817,7 @@ mod test {
     }
 
     #[test]
-    fn test_0xe0_cpx_immediate_X_bigger_M() {
+    fn test_0xe0_cpx_immediate_x_bigger_m() {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0xe0, 0x11, 0x00]);
 	cpu.reset();
@@ -825,7 +838,7 @@ mod test {
 
     // CPY
     #[test]
-    fn test_0xc0_cpy_immediate_Y_equal_M() {
+    fn test_0xc0_cpy_immediate_y_equal_m() {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0xc0, 0x11, 0x00]);
 	cpu.reset();
@@ -835,7 +848,7 @@ mod test {
     }
 
     #[test]
-    fn test_0xc0_cpy_immediate_Y_bigger_M() {
+    fn test_0xc0_cpy_immediate_y_bigger_m() {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0xc0, 0x11, 0x00]);
 	cpu.reset();
@@ -855,6 +868,27 @@ mod test {
     }
     
     // DEC
+    #[test]
+    fn test_0xc6_dec_zero_page_zero() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xc6, 0x02, 0x00]);
+	cpu.reset();
+	cpu.mem_write(0x0002, 0x01);
+	cpu.run();
+	assert_eq!(cpu.mem_read(0x02), 0x00);
+	assert_eq!(cpu.status, ZERO_FLAG);
+    }
+    
+    #[test]
+    fn test_0xc6_dec_zero_page_neg() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xc6, 0x02, 0x00]);
+	cpu.reset();
+	cpu.mem_write(0x0002, 0xFF);
+	cpu.run();
+	assert_eq!(cpu.mem_read(0x02), 0xFE);
+	assert_eq!(cpu.status, NEGATIVE_FLAG);
+    }
     // DEX
     // DEY
     // EOR
