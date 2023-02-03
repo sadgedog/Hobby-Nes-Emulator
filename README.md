@@ -34,8 +34,8 @@ CMP ✅	\
 CPX ✅	\
 CPY ✅	\
 DEC ✅	\
-DEX	\
-DEY	\
+DEX ✅	\
+DEY ✅	\
 EOR	\
 INC	\
 INX	\

@@ -371,6 +371,22 @@ impl CPU {
 	self.update_zero_and_negative_flags(self.register_y);
     }
 
+    fn eor(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	self.register_a ^= value;
+	self.update_zero_and_negative_flags(self.register_a);
+    }
+
+    fn inc(&mut self, mode: &AddressingMode) {
+	
+    }
+
+    fn inx(&mut self) {
+	self.register_x = self.register_x.wrapping_add(1);
+	self.update_zero_and_negative_flags(self.register_x);
+    }
+
     fn lda(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -403,10 +419,7 @@ impl CPU {
 	}
     }
 
-    fn inx(&mut self) {
-	self.register_x = self.register_x.wrapping_add(1);
-	self.update_zero_and_negative_flags(self.register_x);
-    }
+
 
     pub fn load_and_run(&mut self, program: Vec<u8>) {
 	self.load(program);
@@ -503,6 +516,16 @@ impl CPU {
 		0xCA => self.dex(),
 		// DEY (Decrement Y Register)
 		0x88 => self.dey(),
+		// EOR (Exclusive OR)
+		0x49 | 0x45 | 0x55 | 0x4D | 0x5D | 0x59 | 0x41 | 0x51 => {
+		    self.eor(&opcode.mode);
+		}
+		// INC
+		0xE6 | 0xF6 | 0xEE | 0xFE => {
+		    self.inc(&opcode.mode);
+		}
+		// INX
+		0xE8 => self.inx(),
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
@@ -517,8 +540,7 @@ impl CPU {
 		}
 		// TAX (Transfer Accumulator to X)
 		0xAA => self.tax(),
-		// INX
-		0xE8 => self.inx(),
+		
 		
 		_ => todo!(),
 	    }
@@ -951,6 +973,29 @@ mod test {
     }
 
     // EOR
+    #[test]
+    fn test_0x49_eor_immediate_zero() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x49, 0x11, 0x00]); // 0x11 => 0b10001
+	cpu.reset();
+	cpu.register_a = 0x11;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x00);
+	assert_eq!(cpu.status, ZERO_FLAG);
+    }
+
+    #[test]
+    fn test_0x49_eor_immediate_neg() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x49, 0x11, 0x00]); // 0x11 => 0b0001_0001
+	cpu.reset();
+	cpu.register_a = 0xFF;            // 0xFF => 0b1111_1111
+	cpu.run();
+	assert_eq!(cpu.register_a, 0xEE); // 0xaa => 0b1110_1110
+	assert_eq!(cpu.status, NEGATIVE_FLAG);
+    }
+    
+    
     // INC
     
     // INX Increment X Register
