@@ -379,7 +379,11 @@ impl CPU {
     }
 
     fn inc(&mut self, mode: &AddressingMode) {
-	
+	let addr = self.get_operand_address(&mode);
+	let mut value = self.mem_read(addr);
+	value = value.wrapping_add(1);
+	self.mem_write(addr, value);
+	self.update_zero_and_negative_flags(value);
     }
 
     fn inx(&mut self) {
@@ -994,9 +998,29 @@ mod test {
 	assert_eq!(cpu.register_a, 0xEE); // 0xaa => 0b1110_1110
 	assert_eq!(cpu.status, NEGATIVE_FLAG);
     }
-    
-    
+        
     // INC
+    #[test]
+    fn test_0xe6_inc_zeropage_zero() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xe6, 0x02, 0x00]);
+	cpu.reset();
+	cpu.mem_write(0x02, 0xFF);
+	cpu.run();
+	assert_eq!(cpu.mem_read(0x02), 0x00);
+	assert_eq!(cpu.status, ZERO_FLAG);
+    }
+
+    #[test]
+    fn test_0xe6_inc_zeropage_neg() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xe6, 0x02, 0x00]);
+	cpu.reset();
+	cpu.mem_write(0x02, 0x80);
+	cpu.run();
+	assert_eq!(cpu.mem_read(0x02), 0x81);
+	assert_eq!(cpu.status, NEGATIVE_FLAG);
+    }
     
     // INX Increment X Register
     #[test]

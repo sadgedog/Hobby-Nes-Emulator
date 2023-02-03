@@ -36,9 +36,9 @@ CPY ✅	\
 DEC ✅	\
 DEX ✅	\
 DEY ✅	\
-EOR	\
-INC	\
-INX	\
+EOR ✅	\
+INC ✅	\
+INX ✅	\
 INY	\
 JMP	\
 JSR	\
