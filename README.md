@@ -1,5 +1,5 @@
 ## ABOUT THIS
-NES Emulator
+Hobby NES Emulator
 
 book
 
@@ -9,7 +9,7 @@ https://bugzmanov.github.io/nes_ebook/chapter_1.html
 
 https://www.nesdev.org/obelisk-6502-guide/reference.html
 
-cargo test -- --nocapture
+cargo test -- --nocapture (test with std output)
 
 TODO LIST:
 
