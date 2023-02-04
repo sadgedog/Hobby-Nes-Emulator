@@ -489,19 +489,25 @@ impl CPU {
 
     fn lsr(&mut self, mode: &AddressingMode) -> u8 {
 	let addr = self.get_operand_address(mode);
-	let mut data = self.mem_read(addr);
-	if data & 1 == 1 {
+	let mut value = self.mem_read(addr);
+	if value & 1 == 1 {
 	    self.status |= CARRY_FLAG;
 	} else {
 	    self.status &= !CARRY_FLAG;
 	}
-	data = data >> 1;
-	self.mem_write(addr, data);
-	self.update_zero_and_negative_flags(data);
-	data
+	value = value >> 1;
+	self.mem_write(addr, value);
+	self.update_zero_and_negative_flags(value);
+	value
     }
 
     fn nop(&mut self) {} // nothing
+
+    fn ora(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(mode);
+	let mut value = self.mem_read(addr);
+	self.set_register_a(value | self.register_a);
+    }
 
     fn sta(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(mode);
@@ -662,6 +668,10 @@ impl CPU {
 		}
 		// NOP (No Operation)
 		0xEA => self.nop(),
+		// ORA (Logical Inclusive OR)
+		0x09 | 0x05 | 0x15 | 0x0D | 0x1D | 0x19 | 0x01 | 0x11 => {
+		    self.ora(&opcode.mode);
+		}
 		// SBC (Sbstract with Carry)
 		0xE9 | 0xE5 | 0xF5 | 0xED | 0xFD | 0xF9 | 0xE1 | 0xF1 => {
 		    self.sbc(&opcode.mode);
@@ -1359,9 +1369,10 @@ mod test {
     }
 
     // NEGATIVE_FLAG立つのなくね？
-    fn test_0x46_lsr_zero_page_negative_flag() {}
+    // fn test_0x46_lsr_zero_page_negative_flag() {}
     
     // NOP
+    #[test]
     fn test_0xea_nop() {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0xEA, 0x00]); 
@@ -1371,6 +1382,16 @@ mod test {
     }
     
     // ORA
+    #[test]
+    fn test_0x09_ora_immediate() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x09, 0x11, 0x00]); 
+	cpu.reset();
+	cpu.register_a = 0x02;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x13);
+    }
+    
     // PHA
     // PHP
     // PLA

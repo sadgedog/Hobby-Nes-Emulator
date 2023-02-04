@@ -47,7 +47,7 @@ LDX ✅	\
 LDY ✅	\
 LSR ✅	\
 NOP ✅	\
-ORA	\
+ORA ✅	\
 PHA	\
 PHP	\
 PLA	\
