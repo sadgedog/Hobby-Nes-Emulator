@@ -644,9 +644,15 @@ impl CPU {
 	self.mem_write(addr, self.register_a);
     }
 
-    fn stx(&mut self, mode: &AddressingMode) {}
+    fn stx(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	self.mem_write(addr, self.register_x);
+    }
 
-    fn sty(&mut self, mode: &AddressingMode) {}
+    fn sty(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	self.mem_write(addr, self.register_y);
+    }
 
     fn tax(&mut self) {
 	self.register_x = self.register_a;
@@ -1780,11 +1786,28 @@ mod test {
 	cpu.run();
 	assert_eq!(cpu.mem_read(0xA8), 0x45);
     }
-
     
     // STX
-    // STX
+    #[test]
+    fn test_0x86_stx_zero_page() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x86, 0x10, 0x00]);
+	cpu.reset();
+	cpu.register_x = 0x50;
+	cpu.run();
+	assert_eq!(cpu.mem_read(0x10), 0x50);
+    }
+    
     // STY
+    #[test]
+    fn test_0x84_sty_zero_page() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x84, 0x10, 0x00]);
+	cpu.reset();
+	cpu.register_y = 0x50;
+	cpu.run();
+	assert_eq!(cpu.mem_read(0x10), 0x50);
+    }
 
     // TAX Transfer Accumulator to X
     #[test]

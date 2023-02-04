@@ -61,8 +61,8 @@ SEC ✅	\
 SED ✅	\
 SEI ✅	\
 STA ✅	\
-STX	\
-STY	\
+STX ✅	\
+STY ✅	\
 TAX ✅	\
 TAY	\
 TSX	\
