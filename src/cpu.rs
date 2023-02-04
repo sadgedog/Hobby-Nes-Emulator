@@ -627,11 +627,17 @@ impl CPU {
 	self.add_to_register_a(((value as i8).wrapping_neg().wrapping_sub(1)) as u8);
     }
 
-    fn sec(&mut self) {}
+    fn sec(&mut self) {
+	self.status |= CARRY_FLAG;
+    }
 
-    fn sed(&mut self) {}
+    fn sed(&mut self) {
+	self.status |= DECIMAL_MODE_FLAG;
+    }
 
-    fn sei(&mut self) {}
+    fn sei(&mut self) {
+	self.status |= INTERRUPT_DISABLE;
+    }
 
     fn sta(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(mode);
@@ -1547,7 +1553,7 @@ mod test {
     
     // NOP
     #[test]
-    fn test_0xea_nop() {
+    fn test_0xea_nop_implied() {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0xEA, 0x00]); 
 	cpu.reset();
@@ -1568,7 +1574,7 @@ mod test {
     
     // PHA
     #[test]
-    fn test_0x48_pha() {
+    fn test_0x48_pha_implied() {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0x48, 0x00]); 
 	cpu.reset();
@@ -1579,7 +1585,7 @@ mod test {
     
     // PHP
     #[test]
-    fn test_0x08_php() {
+    fn test_0x08_php_implied() {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0x08, 0x00]); 
 	cpu.reset();
@@ -1593,7 +1599,7 @@ mod test {
     
     // PLA
     #[test]
-    fn test_0x68_pla() {
+    fn test_0x68_pla_implied() {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0x68, 0x00]); 
 	cpu.reset();
@@ -1606,7 +1612,7 @@ mod test {
     
     // PLP
     #[test]
-    fn test_0x28_plp() {
+    fn test_0x28_plp_implied() {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0x28, 0x00]); 
 	cpu.reset();
@@ -1735,8 +1741,34 @@ mod test {
     }
 
     // SEC
+    #[test]
+    fn test_0x38_sec_implied() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x38, 0x00]); 
+	cpu.reset();
+	cpu.run();
+	assert_eq!(cpu.status, CARRY_FLAG);
+    }
+
     // SED
+    #[test]
+    fn test_0xf8_sed_implied() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xf8, 0x00]); 
+	cpu.reset();
+	cpu.run();
+	assert_eq!(cpu.status, DECIMAL_MODE_FLAG);
+    }
+    
     // SEI
+    #[test]
+    fn test_0x78_sei_implied() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x78, 0x00]); 
+	cpu.reset();
+	cpu.run();
+	assert_eq!(cpu.status, INTERRUPT_DISABLE);
+    }
 
     // STA
     #[test]

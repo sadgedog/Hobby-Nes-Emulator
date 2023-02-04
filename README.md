@@ -57,9 +57,9 @@ ROR ✅	\
 RTI ✅	\
 RTS ✅	\
 SBC ✅	\
-SEC	\
-SED	\
-SEI	\
+SEC ✅	\
+SED ✅	\
+SEI ✅	\
 STA ✅	\
 STX	\
 STY	\
