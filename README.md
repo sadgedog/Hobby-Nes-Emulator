@@ -43,8 +43,8 @@ INY ✅	\
 JMP ✅	\
 JSR ✅	\
 LDA ✅	\
-LDX	\
-LDY	\
+LDX ✅	\
+LDY ✅	\
 LSR	\
 NOP	\
 ORA	\
@@ -69,3 +69,4 @@ TSX	\
 TXA	\
 TXS	\
 TYA	\
+

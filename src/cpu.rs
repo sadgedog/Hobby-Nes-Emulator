@@ -146,7 +146,7 @@ impl CPU {
 	    // }
 	    AddressingMode::Indirect_jmp => {
 		let addr = self.mem_read_u16(self.program_counter);
-		let mut indirect_ref;
+		let indirect_ref;
 		if addr & 0x00FF == 0x00FF {
 		    let lo = self.mem_read(addr);
 		    let hi = self.mem_read(addr & 0xFF00);
@@ -458,9 +458,22 @@ impl CPU {
     fn lda(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
-	
 	self.register_a = value;
 	self.update_zero_and_negative_flags(self.register_a);
+    }
+
+    fn ldx(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	self.register_x = value;
+	self.update_zero_and_negative_flags(self.register_x);
+    }
+
+    fn ldy(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	self.register_y = value;
+	self.update_zero_and_negative_flags(self.register_y);
     }
 
     fn sta(&mut self, mode: &AddressingMode) {
@@ -605,6 +618,14 @@ impl CPU {
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
+		}
+		// LDX (Load X Register)
+		0xA2 | 0xA6 | 0xB6 | 0xAE | 0xBE => {
+		    self.ldx(&opcode.mode);
+		}
+		// LDY (Load Y Register)
+		0xA0 | 0xA4 | 0xB4 | 0xAC | 0xBC => {
+		    self.ldy(&opcode.mode);
 		}
 		// SBC (Sbstract with Carry)
 		0xE9 | 0xE5 | 0xF5 | 0xED | 0xFD | 0xF9 | 0xE1 | 0xF1 => {
@@ -1094,7 +1115,7 @@ mod test {
 	assert_eq!(cpu.status, NEGATIVE_FLAG);
     }
     
-    // INX Increment X Register
+    // INX
     #[test]
     fn test_inx_overflow() {
         let mut cpu = CPU::new();
@@ -1102,7 +1123,7 @@ mod test {
         assert_eq!(cpu.register_x, 1);
     }
     
-    // INY Increment Y Register
+    // INY
     #[test]
     fn test_iny_0xc8_zero_flag() {
 	let mut cpu = CPU::new();
@@ -1260,9 +1281,26 @@ mod test {
         assert!(cpu.status & 0b0000_0010 == 0b10);
     }
 
-
     // LDX
+    #[test]
+    fn test_0xa2_ldx_immediate() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xA2, 0x05, 0x00]);	
+        assert_eq!(cpu.register_x, 5);
+        assert!(cpu.status & 0b0000_0010 == 0);
+        assert!(cpu.status & 0b1000_0000 == 0);
+    }
+    
     // LDY
+    #[test]
+    fn test_0xa0_ldy_immediate() {
+        let mut cpu = CPU::new();
+        cpu.load_and_run(vec![0xA0, 0x05, 0x00]);	
+        assert_eq!(cpu.register_y, 5);
+        assert!(cpu.status & 0b0000_0010 == 0);
+        assert!(cpu.status & 0b1000_0000 == 0);
+    }
+
     // LSR
     // NOP
     // ORA
