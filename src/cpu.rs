@@ -575,9 +575,40 @@ impl CPU {
 	value
     }
 
-    fn ror_accumulator(&mut self) {}
+    fn ror_accumulator(&mut self) {
+	let mut value = self.register_a;
+	let tmp = self.status & CARRY_FLAG;
+	if value & 1 == 1 {
+	    self.status |= CARRY_FLAG;
+	} else {
+	    self.status &= !CARRY_FLAG
+	}
+	// right shift
+	value = value >> 1;
+	if tmp != 0 {
+	    value |= 0x80; // 0b1000_0000
+	}
+	self.set_register_a(value);
+    }
     
-    fn ror(&mut self, mode: &AddressingMode) {}
+    fn ror(&mut self, mode: &AddressingMode) -> u8 {
+	let addr = self.get_operand_address(mode);
+	let mut value = self.mem_read(addr);
+	let tmp = self.status & CARRY_FLAG;
+
+	if value & 1 == 1 {
+	    self.status |= CARRY_FLAG;
+	} else {
+	    self.status &= !CARRY_FLAG;
+	}
+	value = value << 1;
+	if tmp != 0 {
+	    value |= 0x80; // 0b1000_0000
+	}
+	self.mem_write(addr, value);
+	self.update_zero_and_negative_flags(value);
+	value
+    }
 
     fn rti(&mut self) {}
 
@@ -1578,7 +1609,7 @@ mod test {
     
     // ROL
     #[test]
-    fn test_0x2a_rol() {
+    fn test_0x2a_rol_accumulator() {
 	let mut cpu = CPU::new();
 	cpu.load(vec![0x2A, 0x00]);
 	cpu.reset();
@@ -1595,9 +1626,31 @@ mod test {
 	cpu.mem_write(0x10, 0x50);            // 0b0101_0000
 	cpu.run();
 	assert_eq!(cpu.mem_read(0x10), 0xA0); // 0b1010_0000
+	assert_eq!(cpu.status, NEGATIVE_FLAG);
     }
     
     // ROR
+    #[test]
+    fn test_0x6a_ror_accumulator() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x6A, 0x00]);
+	cpu.reset();
+	cpu.register_a = 0xA1;            // 0b1010_0001
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x50); // 0b0101_0000
+    }
+
+    #[test]
+    fn test_0x66_ror_zero_page() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x66, 0x10, 0x00]);
+	cpu.reset();
+	cpu.mem_write(0x10, 0xA1);            // 0b1010_0001
+	cpu.run();
+	assert_eq!(cpu.mem_read(0x10), 0x42); // 0b0100_0010
+    }
+    
+    
     // RTI
     // RTS
 

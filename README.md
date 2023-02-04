@@ -53,7 +53,7 @@ PHP ✅	\
 PLA ✅	\
 PLP ✅	\
 ROL ✅	\
-ROR	\
+ROR ✅	\
 RTI	\
 RTS	\
 SBC ✅	\
