@@ -39,7 +39,7 @@ DEY ✅	\
 EOR ✅	\
 INC ✅	\
 INX ✅	\
-INY	\
+INY ✅	\
 JMP	\
 JSR	\
 LDA ✅	\

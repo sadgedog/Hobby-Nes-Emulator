@@ -391,6 +391,11 @@ impl CPU {
 	self.update_zero_and_negative_flags(self.register_x);
     }
 
+    fn iny(&mut self) {
+	self.register_y = self.register_y.wrapping_add(1);
+	self.update_zero_and_negative_flags(self.register_y);
+    }
+
     fn lda(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -530,6 +535,8 @@ impl CPU {
 		}
 		// INX
 		0xE8 => self.inx(),
+		// INY
+		0xC8 => self.iny(),
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
@@ -1027,10 +1034,32 @@ mod test {
     fn test_inx_overflow() {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xA9, 0xFF, 0xAA,0xE8, 0xE8, 0x00]);
-        assert_eq!(cpu.register_x, 1)
+        assert_eq!(cpu.register_x, 1);
     }
     
-    // INY
+    // INY Increment Y Register
+    #[test]
+    fn test_iny_0xc8_zero_flag() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xC8, 0x00]);
+	cpu.reset();
+	cpu.register_y = 0xFF;
+	cpu.run();
+        assert_eq!(cpu.register_y, 0x00);
+	assert_eq!(cpu.status, ZERO_FLAG);
+    }
+
+    #[test]
+    fn test_iny_0xc8_neg_flag() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xC8, 0x00]);
+	cpu.reset();
+	cpu.register_y = 0x80;
+	cpu.run();
+        assert_eq!(cpu.register_y, 0x81);
+	assert_eq!(cpu.status, NEGATIVE_FLAG);
+    }
+    
     // JMP
     // JSR
     
