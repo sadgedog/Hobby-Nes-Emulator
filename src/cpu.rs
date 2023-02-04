@@ -35,6 +35,8 @@ pub enum AddressingMode {
     Indirect_X,
     Indirect_Y,
     NoneAddressing,
+    // Absolute_jmp,
+    Indirect_jmp,
 }
 
 trait Mem {
@@ -130,6 +132,23 @@ impl CPU {
 	    // Undefined Addressing
 	    AddressingMode::NoneAddressing => {
 		panic!("mode {:?} is not supported", mode);
+	    }
+	    // JMP
+	    // AddressingMode::Absolute_jmp => {
+	    // 	let addr = self.mem_read_u16(self.program_counter);
+	    // 	addr
+	    // }
+	    AddressingMode::Indirect_jmp => {
+		let addr = self.mem_read_u16(self.program_counter);
+		let mut indirect_ref;
+		if addr & 0x00FF == 0x00FF {
+		    let lo = self.mem_read(addr);
+		    let hi = self.mem_read(addr & 0xFF00);
+		    indirect_ref = (hi as u16) << 8 | (lo as u16);
+		} else {
+		    indirect_ref = self.mem_read_u16(addr);
+		};
+		indirect_ref
 	    }
 	}
     }
@@ -396,6 +415,11 @@ impl CPU {
 	self.update_zero_and_negative_flags(self.register_y);
     }
 
+    fn jmp(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	self.program_counter = addr;
+    }
+
     fn lda(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -537,6 +561,10 @@ impl CPU {
 		0xE8 => self.inx(),
 		// INY
 		0xC8 => self.iny(),
+		// JMP
+		0x4C | 0x6C => {
+		    self.jmp(&opcode.mode);
+		}
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
@@ -1061,6 +1089,36 @@ mod test {
     }
     
     // JMP
+    #[test]
+    fn test_0x4c_jmp_absolute() {
+	let mut cpu = CPU::new();
+        cpu.load(vec![0x4C, 0x05, 0x10, 0x00]);	// 0x1005
+	cpu.reset();
+	cpu.run();
+	assert_eq!(cpu.program_counter, 0x1005 + 0x01); // 0x00で+1
+    }
+
+    #[test]
+    fn test_0x6c_jmp_indirect() {
+	// no bug
+	let mut cpu = CPU::new();
+        cpu.load(vec![0x6C, 0x05, 0x10, 0x00]);	// 0x1005
+	cpu.reset();
+	cpu.mem_write_u16(0x1005, 0x50);
+	cpu.run();
+	assert_eq!(cpu.program_counter, 0x50 + 0x01); // 0x00で+1
+	// with bug
+	let mut cpu = CPU::new();
+        cpu.load(vec![0x6C, 0xFF, 0x30, 0x00]);	// 0x30FF
+	cpu.reset();
+	cpu.mem_write_u16(0x3000, 0x40);
+	cpu.mem_write_u16(0x30FF, 0x80);
+	cpu.mem_write_u16(0x3100, 0x50); // 本当は0x5080になるべきだがバグで0x4080になるらしい
+	cpu.run(); // 下位8bitの繰り上がりを考慮したJMPにならない
+	assert_eq!(cpu.program_counter, 0x4080 + 0x01); // 0x00で+1
+    }
+
+    
     // JSR
     
     // LDA
