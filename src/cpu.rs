@@ -659,15 +659,29 @@ impl CPU {
 	self.update_zero_and_negative_flags(self.register_x);
     }    
 
-    fn tay(&mut self) {}
+    fn tay(&mut self) {
+	self.register_y = self.register_a;
+	self.update_zero_and_negative_flags(self.register_y);
+    }
 
-    fn tsx(&mut self) {}
+    fn tsx(&mut self) {
+	self.register_x = self.stack_pointer;
+	self.update_zero_and_negative_flags(self.register_x);
+    }
 
-    fn txa(&mut self) {}
+    fn txa(&mut self) {
+	self.register_a = self.register_x;
+	self.update_zero_and_negative_flags(self.register_a);
+    }
 
-    fn txs(&mut self) {}
+    fn txs(&mut self) {
+	self.stack_pointer = self.register_x;
+    }
 
-    fn tya(&mut self) {}
+    fn tya(&mut self) {
+	self.register_a = self.register_y;
+	self.update_zero_and_negative_flags(self.register_a);
+    }
 
     pub fn load_and_run(&mut self, program: Vec<u8>) {
 	self.load(program);
@@ -1809,19 +1823,68 @@ mod test {
 	assert_eq!(cpu.mem_read(0x10), 0x50);
     }
 
-    // TAX Transfer Accumulator to X
+    // TAX
     #[test]
-    fn test_0xaa_tax_move_a_to_x() {
+    fn test_0xaa_tax_implied() {
         let mut cpu = CPU::new();
         cpu.load_and_run(vec![0xA9, 0x0A, 0xAA, 0x00]);	
         assert_eq!(cpu.register_x, 10)
     }
 
     // TAY
+    #[test]
+    fn test_0xa8_tay_implied() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xA8, 0x00]);
+	cpu.reset();
+	cpu.register_a = 0x10;
+	cpu.run();
+	assert_eq!(cpu.register_y, 0x10);
+    }
+    
     // TSX
+    #[test]
+    fn test_0xba_tsx_implied() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xBA, 0x00]);
+	cpu.reset();
+	cpu.stack_pointer = 0x35;
+	cpu.run();
+	assert_eq!(cpu.register_x, 0x35);
+    }
+    
     // TXA
+    #[test]
+    fn test_0x8a_tsa_implied() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x8A, 0x00]);
+	cpu.reset();
+	cpu.register_x = 0x35;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x35);
+    }
+    
     // TXS
+    #[test]
+    fn test_0x9a_txs_implied() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x9A, 0x00]);
+	cpu.reset();
+	cpu.register_x = 0x35;
+	cpu.run();
+	assert_eq!(cpu.stack_pointer, 0x35);
+    }
+    
     // TYA
+    #[test]
+    fn test_0x98_tya_implied() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x98, 0x00]);
+	cpu.reset();
+	cpu.register_y = 0x35;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x35);
+    }
 
     // other
     #[test]

@@ -64,8 +64,8 @@ STA ✅	\
 STX ✅	\
 STY ✅	\
 TAX ✅	\
-TAY	\
-TSX	\
-TXA	\
-TXS	\
-TYA	
+TAY ✅	\
+TSX ✅	\
+TXA ✅	\
+TXS ✅	\
+TYA ✅	
