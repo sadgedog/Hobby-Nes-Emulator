@@ -501,6 +501,8 @@ impl CPU {
 	data
     }
 
+    fn nop(&mut self) {} // nothing
+
     fn sta(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(mode);
 	self.mem_write(addr, self.register_a);
@@ -658,6 +660,8 @@ impl CPU {
 		0x46 | 0x56 | 0x4E | 0x5E => {
 		    self.lsr(&opcode.mode);
 		}
+		// NOP (No Operation)
+		0xEA => self.nop(),
 		// SBC (Sbstract with Carry)
 		0xE9 | 0xE5 | 0xF5 | 0xED | 0xFD | 0xF9 | 0xE1 | 0xF1 => {
 		    self.sbc(&opcode.mode);
@@ -1353,8 +1357,19 @@ mod test {
 	assert_eq!(cpu.mem_read(0x10), 0x00);
 	assert_eq!(cpu.status, ZERO_FLAG | CARRY_FLAG);
     }
+
+    // NEGATIVE_FLAG立つのなくね？
+    fn test_0x46_lsr_zero_page_negative_flag() {}
     
     // NOP
+    fn test_0xea_nop() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0xEA, 0x00]); 
+	cpu.reset();
+	cpu.run();
+	assert_eq!(cpu.status, 0x00);
+    }
+    
     // ORA
     // PHA
     // PHP

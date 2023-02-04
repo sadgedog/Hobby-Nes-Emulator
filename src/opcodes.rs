@@ -152,6 +152,8 @@ lazy_static! {
 	OpCode::new(0x4E, "LSR", 3, 6, AddressingMode::Absolute),
 	OpCode::new(0x5E, "LSR", 3, 7, AddressingMode::Absolute_X),
 
+	OpCode::new(0xEA, "NOP", 1, 2, AddressingMode::NoneAddressing),
+
 	OpCode::new(0xE9, "SBC", 2, 2, AddressingMode::Immediate),
 	OpCode::new(0xE5, "SBC", 2, 3, AddressingMode::ZeroPage),
 	OpCode::new(0xF5, "SBC", 2, 4, AddressingMode::ZeroPage_X),
