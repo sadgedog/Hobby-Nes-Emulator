@@ -40,8 +40,8 @@ EOR ✅	\
 INC ✅	\
 INX ✅	\
 INY ✅	\
-JMP	\
-JSR	\
+JMP ✅	\
+JSR ✅	\
 LDA ✅	\
 LDX	\
 LDY	\

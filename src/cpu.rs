@@ -1,12 +1,17 @@
 use std::collections::HashMap;
 use crate::opcodes;
 
+// stack
+const STACK: u16 = 0x0100;
+const STACK_RESET: u8 = 0xfd;
+
 pub struct CPU {
     pub register_a: u8,
     pub register_x: u8,
     pub register_y: u8,
     pub status: u8,
     pub program_counter: u16,
+    pub stack_pointer: u8,
     memory: [u8; 0xFFFF]
 }
 
@@ -76,6 +81,7 @@ impl CPU {
 	    register_y: 0,
 	    status: 0,
 	    program_counter: 0,
+	    stack_pointer: STACK_RESET,
 	    memory: [0; 0xFFFF]
 	}
     }
@@ -185,6 +191,29 @@ impl CPU {
     fn set_register_a(&mut self, value: u8) {
 	self.register_a = value;
 	self.update_zero_and_negative_flags(self.register_a);
+    }
+
+    fn stack_pop(&mut self) -> u8 {
+	self.stack_pointer = self.stack_pointer.wrapping_add(1);
+	self.mem_read((STACK as u16) + self.stack_pointer as u16)
+    }
+
+    fn stack_push(&mut self, data: u8) {
+	self.mem_write((STACK as u16) + self.stack_pointer as u16, data);
+	self.stack_pointer = self.stack_pointer.wrapping_sub(1)
+    }
+
+    fn stack_pop_u16(&mut self) -> u16 {
+	let lo = self.stack_pop() as u16;
+	let hi = self.stack_pop() as u16;
+	hi << 8 | lo
+    }
+
+    fn stack_push_u16(&mut self, data: u16) {
+	let hi = (data >> 8) as u8;
+	let lo = (data & 0xFF) as u8;
+	self.stack_push(hi);
+	self.stack_push(lo);
     }
     
     fn adc(&mut self, mode: &AddressingMode) {
@@ -420,6 +449,12 @@ impl CPU {
 	self.program_counter = addr;
     }
 
+    fn jsr(&mut self, mode: &AddressingMode) {
+	self.stack_push_u16(self.program_counter + 2 - 1);
+	let addr = self.get_operand_address(&mode);
+	self.program_counter = addr;
+    }
+
     fn lda(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -452,8 +487,6 @@ impl CPU {
 	}
     }
 
-
-
     pub fn load_and_run(&mut self, program: Vec<u8>) {
 	self.load(program);
 	self.reset();
@@ -468,6 +501,8 @@ impl CPU {
     pub fn reset(&mut self) {
 	self.register_a = 0;
 	self.register_x = 0;
+	self.register_y = 0;
+	self.stack_pointer = STACK_RESET;
 	self.status = 0;
 	// 0xFFFC, 0xFFFDにはloadの時点で0x00,0x80つまり0x8000が入っているはず
 	self.program_counter = self.mem_read_u16(0xFFFC);
@@ -553,18 +588,20 @@ impl CPU {
 		0x49 | 0x45 | 0x55 | 0x4D | 0x5D | 0x59 | 0x41 | 0x51 => {
 		    self.eor(&opcode.mode);
 		}
-		// INC
+		// INC (Increment Memory)
 		0xE6 | 0xF6 | 0xEE | 0xFE => {
 		    self.inc(&opcode.mode);
 		}
-		// INX
+		// INX (Incremetn X Register)
 		0xE8 => self.inx(),
-		// INY
+		// INY (Increment Y Register)
 		0xC8 => self.iny(),
-		// JMP
+		// JMP (Jump)
 		0x4C | 0x6C => {
 		    self.jmp(&opcode.mode);
 		}
+		// JSR (Jump to Subroutine)
+		0x20 => self.jsr(&opcode.mode),
 		// LDA (Load Accumulator)
 		0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
 		    self.lda(&opcode.mode);
@@ -1117,9 +1154,17 @@ mod test {
 	cpu.run(); // 下位8bitの繰り上がりを考慮したJMPにならない
 	assert_eq!(cpu.program_counter, 0x4080 + 0x01); // 0x00で+1
     }
-
     
     // JSR
+    #[test]
+    fn test_0x20_jsr_absolute() {
+	let mut cpu = CPU::new();
+        cpu.load(vec![0x20, 0x05, 0x10, 0x00]);	// 0x1005
+	cpu.reset();
+	cpu.run();
+	assert_eq!(cpu.program_counter, 0x1005 + 0x01); // 0x00で+1
+	assert_eq!(cpu.stack_pointer, 0xFB);
+    }
     
     // LDA
     #[test]
