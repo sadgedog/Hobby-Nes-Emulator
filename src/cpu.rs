@@ -193,6 +193,20 @@ impl CPU {
 	self.update_zero_and_negative_flags(self.register_a);
     }
 
+    fn update_zero_and_negative_flags(&mut self, result: u8) {
+	if result == 0 {
+	    self.status = self.status | ZERO_FLAG;
+	} else {
+	    self.status = self.status & !ZERO_FLAG;
+	}
+
+	if result & 0b1000_0000 != 0 {
+	    self.status = self.status | NEGATIVE_FLAG;
+	} else {
+	    self.status = self.status & !NEGATIVE_FLAG;
+	}
+    }
+
     fn stack_pop(&mut self) -> u8 {
 	self.stack_pointer = self.stack_pointer.wrapping_add(1);
 	self.mem_read((STACK as u16) + self.stack_pointer as u16)
@@ -220,12 +234,6 @@ impl CPU {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
 	self.add_to_register_a(value);
-    }
-
-    fn sbc(&mut self, mode: &AddressingMode) {
-	let addr = self.get_operand_address(&mode);
-	let value = self.mem_read(addr);
-	self.add_to_register_a(((value as i8).wrapping_neg().wrapping_sub(1)) as u8);
     }
 
     fn and(&mut self, mode: &AddressingMode) {
@@ -532,29 +540,49 @@ impl CPU {
 	self.status |= BREAK2_COMMAND;
     }
 
+    fn rol(&mut self, mode: &AddressingMode) {}
+
+    fn ror(&mut self, mode: &AddressingMode) {}
+
+    fn rti(&mut self) {}
+
+    fn rts(&mut self) {}
+
+    fn sbc(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	self.add_to_register_a(((value as i8).wrapping_neg().wrapping_sub(1)) as u8);
+    }
+
+    fn sec(&mut self) {}
+
+    fn sed(&mut self) {}
+
+    fn sei(&mut self) {}
+
     fn sta(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(mode);
 	self.mem_write(addr, self.register_a);
     }
 
+    fn stx(&mut self, mode: &AddressingMode) {}
+
+    fn sty(&mut self, mode: &AddressingMode) {}
+
     fn tax(&mut self) {
 	self.register_x = self.register_a;
 	self.update_zero_and_negative_flags(self.register_x);
-    }
+    }    
 
-    fn update_zero_and_negative_flags(&mut self, result: u8) {
-	if result == 0 {
-	    self.status = self.status | ZERO_FLAG;
-	} else {
-	    self.status = self.status & !ZERO_FLAG;
-	}
+    fn tay(&mut self) {}
 
-	if result & 0b1000_0000 != 0 {
-	    self.status = self.status | NEGATIVE_FLAG;
-	} else {
-	    self.status = self.status & !NEGATIVE_FLAG;
-	}
-    }
+    fn tsx(&mut self) {}
+
+    fn txa(&mut self) {}
+
+    fn txs(&mut self) {}
+
+    fn tya(&mut self) {}
 
     pub fn load_and_run(&mut self, program: Vec<u8>) {
 	self.load(program);
@@ -704,29 +732,51 @@ impl CPU {
 		// PLP (Pull Processor Status)
 		0x28 => self.plp(),
 		// ROL (Rotate Left)
+		0x2A | 0x26 | 0x36 | 0x2E | 0x3E => {
+		    self.rol(&opcode.mode);
+		}
 		// ROR (Rotate Right)
+		0x6A | 0x66 | 0x76 | 0x6E | 0x7E => {
+		    self.ror(&opcode.mode);
+		}
 		// RTI (Return from Interrupt)
+		0x40 => self.rti(),
 		// RTS (Return from Subeourine)
+		0x60 => self.rts(),
 		// SBC (Sbstract with Carry)
 		0xE9 | 0xE5 | 0xF5 | 0xED | 0xFD | 0xF9 | 0xE1 | 0xF1 => {
 		    self.sbc(&opcode.mode);
 		}
 		// SEC (Set Carry Flag)
+		0x38 => self.sec(),
 		// SED (Set Decimal Flag)
+		0xF8 => self.sed(),
 		// SEI (SetInterrupt Disable)
+		0x78 => self.sei(),
 		// STA (Store Accumulator)
 		0x85 | 0x95 | 0x8D | 0x9D | 0x99 | 0x81 | 0x91 => {
 		    self.sta(&opcode.mode);
 		}
 		// STX (Store X Register)
+		0x86 | 0x96 | 0x8E => {
+		    self.stx(&opcode.mode);
+		}
 		// STY (Store Y Register)
+		0x84 | 0x94 | 0x8C => {
+		    self.sty(&opcode.mode);
+		}
 		// TAX (Transfer Accumulator to X)
 		0xAA => self.tax(),
 		// TAY (Transfer Accumulator to Y)
+		0xA8 => self.tay(),
 		// TSX (Transfer Stack Pointer to X)
+		0xBA => self.tsx(),
 		// TXA (Transfer X to Accumulator)
+		0x8A => self.txa(),
 		// TXS (Transfer X to Stack Pointer)
+		0x9A => self.txs(),
 		// TYA (Transfer Y to Accumulator)
+		0x98 => self.tya(),
 		
 		_ => todo!(),
 	    }
