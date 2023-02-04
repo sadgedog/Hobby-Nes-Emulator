@@ -54,8 +54,8 @@ PLA ✅	\
 PLP ✅	\
 ROL ✅	\
 ROR ✅	\
-RTI	\
-RTS	\
+RTI ✅	\
+RTS ✅	\
 SBC ✅	\
 SEC	\
 SED	\

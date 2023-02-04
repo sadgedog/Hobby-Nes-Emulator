@@ -513,7 +513,7 @@ impl CPU {
 
     fn ora(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(mode);
-	let mut value = self.mem_read(addr);
+	let value = self.mem_read(addr);
 	self.set_register_a(value | self.register_a);
     }
 
@@ -610,9 +610,16 @@ impl CPU {
 	value
     }
 
-    fn rti(&mut self) {}
+    fn rti(&mut self) {
+	self.status = self.stack_pop();
+	self.status &= !BREAK_COMMAND;
+	self.status |= BREAK2_COMMAND;
+	self.program_counter = self.stack_pop_u16();
+    }
 
-    fn rts(&mut self) {}
+    fn rts(&mut self) {
+	self.program_counter = self.stack_pop_u16() + 1;
+    }
 
     fn sbc(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
@@ -1652,7 +1659,24 @@ mod test {
     
     
     // RTI
+    #[test]
+    fn test_0x40_rti_implied() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x40, 0x00]);
+	cpu.reset();
+	cpu.run();
+	assert_eq!(cpu.program_counter, 0x01);
+    }
+    
     // RTS
+    #[test]
+    fn test_0x60_rts_implied() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x60, 0x00]);
+	cpu.reset();
+	cpu.run();
+	assert_eq!(cpu.program_counter, 0x02);
+    }
 
     // SBC A-M-(1-C)
     #[test]
