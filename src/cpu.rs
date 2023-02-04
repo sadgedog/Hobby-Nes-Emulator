@@ -703,17 +703,30 @@ impl CPU {
 		0x68 => self.pla(),
 		// PLP (Pull Processor Status)
 		0x28 => self.plp(),
+		// ROL (Rotate Left)
+		// ROR (Rotate Right)
+		// RTI (Return from Interrupt)
+		// RTS (Return from Subeourine)
 		// SBC (Sbstract with Carry)
 		0xE9 | 0xE5 | 0xF5 | 0xED | 0xFD | 0xF9 | 0xE1 | 0xF1 => {
 		    self.sbc(&opcode.mode);
 		}
+		// SEC (Set Carry Flag)
+		// SED (Set Decimal Flag)
+		// SEI (SetInterrupt Disable)
 		// STA (Store Accumulator)
 		0x85 | 0x95 | 0x8D | 0x9D | 0x99 | 0x81 | 0x91 => {
 		    self.sta(&opcode.mode);
 		}
+		// STX (Store X Register)
+		// STY (Store Y Register)
 		// TAX (Transfer Accumulator to X)
 		0xAA => self.tax(),
-		
+		// TAY (Transfer Accumulator to Y)
+		// TSX (Transfer Stack Pointer to X)
+		// TXA (Transfer X to Accumulator)
+		// TXS (Transfer X to Stack Pointer)
+		// TYA (Transfer Y to Accumulator)
 		
 		_ => todo!(),
 	    }
