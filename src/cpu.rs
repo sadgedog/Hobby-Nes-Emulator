@@ -476,6 +476,31 @@ impl CPU {
 	self.update_zero_and_negative_flags(self.register_y);
     }
 
+    fn lsr_accumulator(&mut self) {
+	let mut data = self.register_a;
+	if data & 1 == 1 {
+	    self.status |= CARRY_FLAG;
+	} else {
+	    self.status &= !CARRY_FLAG;
+	}
+	data = data >> 1; // data * 2
+	self.set_register_a(data)
+    }
+
+    fn lsr(&mut self, mode: &AddressingMode) -> u8 {
+	let addr = self.get_operand_address(mode);
+	let mut data = self.mem_read(addr);
+	if data & 1 == 1 {
+	    self.status |= CARRY_FLAG;
+	} else {
+	    self.status &= !CARRY_FLAG;
+	}
+	data = data >> 1;
+	self.mem_write(addr, data);
+	self.update_zero_and_negative_flags(data);
+	data
+    }
+
     fn sta(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(mode);
 	self.mem_write(addr, self.register_a);
@@ -623,9 +648,15 @@ impl CPU {
 		0xA2 | 0xA6 | 0xB6 | 0xAE | 0xBE => {
 		    self.ldx(&opcode.mode);
 		}
-		// LDY (Load Y Register)
+		// LDY
 		0xA0 | 0xA4 | 0xB4 | 0xAC | 0xBC => {
 		    self.ldy(&opcode.mode);
+		}
+		// LSR (Logic Shift Right Accumulator)
+		0x4A => self.lsr_accumulator(),
+		// LSR (Logic Shift Right)
+		0x46 | 0x56 | 0x4E | 0x5E => {
+		    self.lsr(&opcode.mode);
 		}
 		// SBC (Sbstract with Carry)
 		0xE9 | 0xE5 | 0xF5 | 0xED | 0xFD | 0xF9 | 0xE1 | 0xF1 => {
@@ -1302,6 +1333,27 @@ mod test {
     }
 
     // LSR
+    #[test]
+    fn test_0x4a_lsr_accumulator() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x4a, 0x00]); 
+	cpu.reset();
+	cpu.register_a = 0x04;
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x02);
+    }
+
+    #[test]
+    fn test_0x46_lsr_zero_page_carry_and_zero_flag() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x46, 0x10, 0x00]); 
+	cpu.reset();
+	cpu.mem_write(0x10, 0x01);
+	cpu.run();
+	assert_eq!(cpu.mem_read(0x10), 0x00);
+	assert_eq!(cpu.status, ZERO_FLAG | CARRY_FLAG);
+    }
+    
     // NOP
     // ORA
     // PHA

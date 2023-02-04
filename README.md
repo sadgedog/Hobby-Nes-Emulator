@@ -45,7 +45,7 @@ JSR ✅	\
 LDA ✅	\
 LDX ✅	\
 LDY ✅	\
-LSR	\
+LSR ✅	\
 NOP	\
 ORA	\
 PHA	\
@@ -68,5 +68,4 @@ TAY	\
 TSX	\
 TXA	\
 TXS	\
-TYA	\
-
+TYA	
