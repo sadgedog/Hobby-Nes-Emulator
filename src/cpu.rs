@@ -691,6 +691,11 @@ impl CPU {
 	// 0xFFFC, 0xFFFDにはloadの時点で0x00,0x80つまり0x8000が入っているはず
 	self.program_counter = self.mem_read_u16(0xFFFC);
     }
+
+    fn crash(&self) {
+	let pc = self.program_counter.wrapping_sub(1); 
+	panic!("unexpected opecode was executed {:?} ", self.mem_read(pc));
+    }
     
     pub fn run(&mut self) {
 	let ref opcodes: HashMap<u8, &'static opcodes::OpCode> = *opcodes::OPCODES_MAP;
@@ -797,7 +802,7 @@ impl CPU {
 		0xA2 | 0xA6 | 0xB6 | 0xAE | 0xBE => {
 		    self.ldx(&opcode.mode);
 		}
-		// LDY
+		// LDY (Load Y Register)
 		0xA0 | 0xA4 | 0xB4 | 0xAC | 0xBC => {
 		    self.ldy(&opcode.mode);
 		}
@@ -871,8 +876,8 @@ impl CPU {
 		0x9A => self.txs(),
 		// TYA (Transfer Y to Accumulator)
 		0x98 => self.tya(),
-		
-		_ => todo!(),
+		// other opecode (crash)
+		_ => self.crash(),
 	    }
 
 	    if program_counter_state == self.program_counter {
