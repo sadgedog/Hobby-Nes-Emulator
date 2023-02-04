@@ -15,7 +15,6 @@ pub struct CPU {
     memory: [u8; 0xFFFF]
 }
 
-// 必要ないけどなんとなく
 const CLEAR_STATUS: u8      = 0b0000_0000;
 // Processor Status
 const CARRY_FLAG: u8        = 0b0000_0001;
@@ -40,7 +39,6 @@ pub enum AddressingMode {
     Indirect_X,
     Indirect_Y,
     NoneAddressing,
-    // Absolute_jmp,
     Indirect_jmp,
 }
 
@@ -139,11 +137,7 @@ impl CPU {
 	    AddressingMode::NoneAddressing => {
 		panic!("mode {:?} is not supported", mode);
 	    }
-	    // JMP
-	    // AddressingMode::Absolute_jmp => {
-	    // 	let addr = self.mem_read_u16(self.program_counter);
-	    // 	addr
-	    // }
+	    // Indirect for jump instruction
 	    AddressingMode::Indirect_jmp => {
 		let addr = self.mem_read_u16(self.program_counter);
 		let indirect_ref;
@@ -297,8 +291,6 @@ impl CPU {
     }
 
     fn beq(&mut self) {
-	// ZERO FLAGがセットされている場合
-	// PC += PCアドレスの値+1
 	if self.status & ZERO_FLAG == ZERO_FLAG {
 	    self.branch();
 	}
@@ -357,9 +349,6 @@ impl CPU {
 	if self.status & CARRY_FLAG == CARRY_FLAG {
 	    self.status -= 1;
 	}
-	// if self.status % 2 != 0 {
-	//     self.status -= 1;
-	// }
     }
 
     fn cld(&mut self) {
@@ -525,7 +514,6 @@ impl CPU {
 	let mut copy = self.status.clone();
 	copy |= BREAK_COMMAND;
 	copy |= BREAK2_COMMAND;
-	// self.stack_push(copy.bits());
 	self.stack_push(copy);
     }
     
