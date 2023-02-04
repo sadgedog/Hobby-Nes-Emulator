@@ -338,8 +338,8 @@ impl CPU {
 	}
     }
 
-    // fn brk(&mut self) {
-    // }
+    fn brk(&mut self) {
+    }
 
     fn bvc(&mut self) {
 	if self.status & OVERFLOW_FLAG == CLEAR_STATUS {
@@ -540,8 +540,43 @@ impl CPU {
 	self.status |= BREAK2_COMMAND;
     }
 
-    fn rol(&mut self, mode: &AddressingMode) {}
+    fn rol_accumulator(&mut self) {
+	let mut value = self.register_a;
+	let tmp = self.status & CARRY_FLAG;
+	if value >> 7 == 1 {
+	    self.status |= CARRY_FLAG;
+	} else {
+	    self.status &= !CARRY_FLAG
+	}
+	// left shift
+	value = value << 1;
+	if tmp != 0 {
+	    value |= 1;
+	}
+	self.set_register_a(value);
+    }
 
+    fn rol(&mut self, mode: &AddressingMode) -> u8 {
+	let addr = self.get_operand_address(mode);
+	let mut value = self.mem_read(addr);
+	let tmp = self.status & CARRY_FLAG;
+
+	if value >> 7 == 1 {
+	    self.status |= CARRY_FLAG;
+	} else {
+	    self.status &= !CARRY_FLAG;
+	}
+	value = value << 1;
+	if tmp != 0 {
+	    value |= 1;
+	}
+	self.mem_write(addr, value);
+	self.update_zero_and_negative_flags(value);
+	value
+    }
+
+    fn ror_accumulator(&mut self) {}
+    
     fn ror(&mut self, mode: &AddressingMode) {}
 
     fn rti(&mut self) {}
@@ -648,7 +683,10 @@ impl CPU {
 		// BPL (Branch if Positive)
 		0x10 => self.bpl(),
 		// BRK (Force Interrupt)
-		0x00 => return,
+		0x00 => {
+		    self.brk();
+		    return
+		}
 		// BVC (Branch if Overflow Clear)
 		0x50 => self.bvc(),
 		// BVS (Branch if Overflow Set)
@@ -731,12 +769,16 @@ impl CPU {
 		0x68 => self.pla(),
 		// PLP (Pull Processor Status)
 		0x28 => self.plp(),
+		// ROL (Rotate Left Accumulator)
+		0x2A => self.rol_accumulator(),
 		// ROL (Rotate Left)
-		0x2A | 0x26 | 0x36 | 0x2E | 0x3E => {
+		0x26 | 0x36 | 0x2E | 0x3E => {
 		    self.rol(&opcode.mode);
 		}
+		// ROR (Rotate Right Accumulator)
+		0x6A => self.ror_accumulator(),
 		// ROR (Rotate Right)
-		0x6A | 0x66 | 0x76 | 0x6E | 0x7E => {
+		0x66 | 0x76 | 0x6E | 0x7E => {
 		    self.ror(&opcode.mode);
 		}
 		// RTI (Return from Interrupt)
@@ -1535,6 +1577,26 @@ mod test {
     }
     
     // ROL
+    #[test]
+    fn test_0x2a_rol() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x2A, 0x00]);
+	cpu.reset();
+	cpu.register_a = 0xA1;            // 0b1010_0001
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x42); // 0b0100_0010
+    }
+
+    #[test]
+    fn test_0x26_rol_zero_page() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x26, 0x10, 0x00]);
+	cpu.reset();
+	cpu.mem_write(0x10, 0x50);            // 0b0101_0000
+	cpu.run();
+	assert_eq!(cpu.mem_read(0x10), 0xA0); // 0b1010_0000
+    }
+    
     // ROR
     // RTI
     // RTS

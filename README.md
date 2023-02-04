@@ -52,7 +52,7 @@ PHA ✅	\
 PHP ✅	\
 PLA ✅	\
 PLP ✅	\
-ROL	\
+ROL ✅	\
 ROR	\
 RTI	\
 RTS	\
