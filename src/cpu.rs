@@ -509,6 +509,29 @@ impl CPU {
 	self.set_register_a(value | self.register_a);
     }
 
+    fn pha(&mut self) {
+	self.stack_push(self.register_a);
+    }
+    
+    fn php(&mut self) {
+	let mut copy = self.status.clone();
+	copy |= BREAK_COMMAND;
+	copy |= BREAK2_COMMAND;
+	// self.stack_push(copy.bits());
+	self.stack_push(copy);
+    }
+    
+    fn pla(&mut self) {
+	let value = self.stack_pop();
+	self.set_register_a(value);
+    }
+    
+    fn plp(&mut self) {
+	self.status = self.stack_pop();
+	self.status &= !BREAK_COMMAND;
+	self.status |= BREAK2_COMMAND;
+    }
+
     fn sta(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(mode);
 	self.mem_write(addr, self.register_a);
@@ -672,6 +695,14 @@ impl CPU {
 		0x09 | 0x05 | 0x15 | 0x0D | 0x1D | 0x19 | 0x01 | 0x11 => {
 		    self.ora(&opcode.mode);
 		}
+		// PHA (Push Accumulator)
+		0x48 => self.pha(),
+		// PHP (Push Processor Status)
+		0x08 => self.php(),
+		// PLA (Pull Accumulator)
+		0x68 => self.pla(),
+		// PLP (Pull Processor Status)
+		0x28 => self.plp(),
 		// SBC (Sbstract with Carry)
 		0xE9 | 0xE5 | 0xF5 | 0xED | 0xFD | 0xF9 | 0xE1 | 0xF1 => {
 		    self.sbc(&opcode.mode);
@@ -1393,9 +1424,53 @@ mod test {
     }
     
     // PHA
+    #[test]
+    fn test_0x48_pha() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x48, 0x00]); 
+	cpu.reset();
+	cpu.register_a = 0x02;
+	cpu.run();
+	assert_eq!(cpu.stack_pointer, 0xFD - 0x01);
+    }
+    
     // PHP
+    #[test]
+    fn test_0x08_php() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x08, 0x00]); 
+	cpu.reset();
+	cpu.status = 0x02;
+	cpu.run();
+	assert_eq!(cpu.stack_pointer, 0b0011_0000 | 0xFD - 0x01);
+	let tmp = STACK.wrapping_add(cpu.stack_pointer.into()).wrapping_add(1);
+	let tmp_2 = 0x02 | BREAK_COMMAND | BREAK2_COMMAND;
+	assert_eq!(cpu.mem_read(tmp), tmp_2);
+    }
+    
     // PLA
+    #[test]
+    fn test_0x68_pla() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x68, 0x00]); 
+	cpu.reset();
+	let tmp = STACK.wrapping_add(cpu.stack_pointer.into()).wrapping_add(1);
+	cpu.mem_write(tmp, 0x81);
+	cpu.run();
+	assert_eq!(cpu.register_a, 0x81);
+	assert_eq!(cpu.status, NEGATIVE_FLAG);
+    }
+    
     // PLP
+    #[test]
+    fn test_0x28_plp() {
+	let mut cpu = CPU::new();
+	cpu.load(vec![0x28, 0x00]); 
+	cpu.reset();
+	cpu.run();
+	assert_eq!(cpu.status, BREAK2_COMMAND);
+    }
+    
     // ROL
     // ROR
     // RTI

@@ -48,10 +48,10 @@ LDY ✅	\
 LSR ✅	\
 NOP ✅	\
 ORA ✅	\
-PHA	\
-PHP	\
-PLA	\
-PLP	\
+PHA ✅	\
+PHP ✅	\
+PLA ✅	\
+PLP ✅	\
 ROL	\
 ROR	\
 RTI	\
