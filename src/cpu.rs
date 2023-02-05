@@ -42,7 +42,7 @@ pub enum AddressingMode {
     NoneAddressing,
 }
 
-trait Mem {
+pub trait Mem {
     fn mem_read(&self, add: u16) -> u8;
 
     fn mem_write(&mut self, addr: u16, data: u8);
@@ -77,7 +77,7 @@ impl CPU {
 	    register_a: 0,
 	    register_x: 0,
 	    register_y: 0,
-	    status: 0,
+	    status: 0b100100,
 	    program_counter: 0,
 	    stack_pointer: STACK_RESET,
 	    memory: [0; 0xFFFF]
@@ -199,6 +199,14 @@ impl CPU {
 	} else {
 	    self.status = self.status & !NEGATIVE_FLAG;
 	}
+    }
+
+    fn update_negative_flags(&mut self, result: u8) {
+	if result >> 7 == 1 {
+	    self.status |= NEGATIVE_FLAG;
+	} else {
+
+	}self.status &= !NEGATIVE_FLAG;
     }
 
     fn stack_pop(&mut self) -> u8 {
@@ -559,7 +567,7 @@ impl CPU {
 	    value |= 1;
 	}
 	self.mem_write(addr, value);
-	self.update_zero_and_negative_flags(value);
+	self.update_negative_flags(value);
 	value
     }
 
@@ -594,7 +602,7 @@ impl CPU {
 	    value |= 0x80; // 0b1000_0000
 	}
 	self.mem_write(addr, value);
-	self.update_zero_and_negative_flags(value);
+	self.update_negative_flags(value);
 	value
     }
 
@@ -678,8 +686,10 @@ impl CPU {
     }
 
     pub fn load(&mut self, program: Vec<u8>) {
-	self.memory[0x8000 .. (0x8000 + program.len())].copy_from_slice(&program[..]);
-	self.mem_write_u16(0xFFFC, 0x8000);
+	// self.memory[0x8000 .. (0x8000 + program.len())].copy_from_slice(&program[..]);
+	self.memory[0x0600 .. (0x0600 + program.len())].copy_from_slice(&program[..]);
+	// self.mem_write_u16(0xFFFC, 0x8000);
+	self.mem_write_u16(0xFFFC, 0x0600);
     }
 
     pub fn reset(&mut self) {
@@ -687,7 +697,7 @@ impl CPU {
 	self.register_x = 0;
 	self.register_y = 0;
 	self.stack_pointer = STACK_RESET;
-	self.status = 0;
+	self.status = 0b100100;
 	// 0xFFFC, 0xFFFDにはloadの時点で0x00,0x80つまり0x8000が入っているはず
 	self.program_counter = self.mem_read_u16(0xFFFC);
     }
@@ -698,15 +708,22 @@ impl CPU {
     }
     
     pub fn run(&mut self) {
+	self.run_with_callback(|_| {});
+    }
+    
+    pub fn run_with_callback<F>(&mut self, mut callback: F)
+    where
+	F: FnMut(&mut CPU),
+    {
 	let ref opcodes: HashMap<u8, &'static opcodes::OpCode> = *opcodes::OPCODES_MAP;
-	
 	loop {
 	    // 0x8000の値(命令)を読み込む
 	    let code = self.mem_read(self.program_counter);
 	    self.program_counter += 1;
 	    let program_counter_state = self.program_counter;
-
-	    let opcode = opcodes.get(&code).expect(&format!("OpCode {:x} is not recognized", code));
+	    // println!("{}", self.program_counter);
+	    let opcode = opcodes.get(&code).unwrap();//.expect(&format!("OpCode {:x} is not recognized", code));
+	    println!("{:x}", code);
 
 	    match code {
 		// ADC (Add with Carry)
@@ -883,6 +900,7 @@ impl CPU {
 	    if program_counter_state == self.program_counter {
 		self.program_counter += (opcode.len - 1) as u16;
 	    }
+	    callback(self);
 	}
     }
 }
