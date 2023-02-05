@@ -1,17 +1,30 @@
 ## ABOUT THIS
 Hobby NES Emulator
 
-book
+- How To Run
+
+cargo run
+
+![snake_game](./docs/snake_game.gif)
+
+
+- book
 
 https://bugzmanov.github.io/nes_ebook/chapter_1.html
 
-6502 reference
+- 6502 reference
 
 https://www.nesdev.org/obelisk-6502-guide/reference.html
 
-cargo test -- --nocapture (test with std output)
+- cargo test with std output
 
-6502 CPU Instruction ✅
+cargo test -- --nocapture
+
+- finished
+
+6502 CPU Instruction
+
+EZ 6502 CPU SNAKE GAME
 
 |Instructinon  |Check List|
 |--------------|----------|
@@ -90,3 +103,5 @@ add path for sdl2, sdl2_image library in rust
 export LIBRARY_PATH="$LIBRARY_PATH:/opt/homebrew/Cellar/sdl2/2.26.2/lib"
 
 export LIBRARY_PATH="$LIBRARY_PATH:/opt/homebrew/Cellar/sdl2_image/2.6.2_2/lib"
+
+running a test game for CPU complication, changed load point : 0x8000 => 0x0600
