@@ -3,7 +3,7 @@ use crate::opcodes;
 
 // stack
 const STACK: u16 = 0x0100;
-const STACK_RESET: u8 = 0xfd;
+const STACK_RESET: u8 = 0xFD;
 
 pub struct CPU {
     pub register_a: u8,
@@ -21,10 +21,10 @@ const CARRY_FLAG: u8        = 0b0000_0001;
 const ZERO_FLAG: u8         = 0b0000_0010;
 const INTERRUPT_DISABLE: u8 = 0b0000_0100;
 const DECIMAL_MODE_FLAG:u8  = 0b0000_1000;
-const BREAK_COMMAND:u8     = 0b0001_0000;
-const BREAK2_COMMAND:u8    = 0b0010_0000;
-const OVERFLOW_FLAG:u8     = 0b0100_0000;
-const NEGATIVE_FLAG:u8     = 0b1000_0000;
+const BREAK_COMMAND:u8      = 0b0001_0000;
+const BREAK2_COMMAND:u8     = 0b0010_0000;
+const OVERFLOW_FLAG:u8      = 0b0100_0000;
+const NEGATIVE_FLAG:u8      = 0b1000_0000;
 
 #[derive(Debug)]
 #[allow(non_camel_case_types)]
@@ -38,8 +38,8 @@ pub enum AddressingMode {
     Absolute_Y,
     Indirect_X,
     Indirect_Y,
-    NoneAddressing,
     Indirect_jmp,
+    NoneAddressing,
 }
 
 trait Mem {
