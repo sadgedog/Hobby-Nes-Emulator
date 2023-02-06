@@ -22,9 +22,11 @@ cargo test -- --nocapture
 
 - finished
 
-6502 CPU Instruction
+6502 CPU Instruction ✅
 
-EZ 6502 CPU SNAKE GAME
+EZ 6502 CPU SNAKE GAME ✅
+
+BUS ✅
 
 |Instructinon  |Check List|
 |--------------|----------|
@@ -87,8 +89,6 @@ EZ 6502 CPU SNAKE GAME
 
 
 - TODO
-
-BUS
 
 Cartridges
 

@@ -1,5 +1,17 @@
 use crate::cpu::Mem;
 
+//
+// -------  0x2000
+//
+// CPU RAM
+//
+// -------  0x0000
+
+//
+// ----- 0x0800
+//  RAM
+// ----- 0x0000
+
 const RAM: u16 = 0x0000;
 const RAM_MIRRORS_END: u16 = 0x1FFF;
 const PPU_REGISTERS: u16 = 0x2000;
@@ -21,6 +33,8 @@ impl Mem for Bus {
     fn mem_read(&self, addr: u16) -> u8 {
 	match addr {
 	    RAM ..= RAM_MIRRORS_END => {
+		// CPUは0x0000~0x2000の13bitをRAM用に確保してる
+		// RAMは11pinでCPUは16pinなので, 11bitに調整しないといけない
 		let mirror_down_addr = addr & 0b00000_0111_1111_1111;
 		self.cpu_vram[mirror_down_addr as usize]
 	    }
