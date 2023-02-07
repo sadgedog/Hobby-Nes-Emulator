@@ -1,4 +1,5 @@
 use crate::cpu::Mem;
+use crate::cartridge::Rom;
 
 //
 // -------  0x2000
@@ -18,14 +19,24 @@ const PPU_REGISTERS: u16 = 0x2000;
 const PPU_REGISTERS_MIRRORS_END: u16 = 0x3FFF;
 
 pub struct Bus {
-    cpu_vram: [u8; 2048]
+    cpu_vram: [u8; 2048],
+    rom: Rom,
 }
 
 impl Bus {
-    pub fn new() -> Self {
+    pub fn new(rom: Rom) -> Self {
 	Bus {
-	    cpu_vram: [0; 2048]
+	    cpu_vram: [0; 2048],
+	    rom: rom,
 	}
+    }
+
+    fn read_prg_rom(&self, mut addr: u16) -> u8 {
+	addr -= 0x8000;
+	if self.rom.prg_rom.len() == 0x4000 && addr >= 0x4000 {
+	    addr = addr % 0x4000;
+	}
+	self.rom.prg_rom[addr as usize]
     }
 }
 
@@ -42,6 +53,7 @@ impl Mem for Bus {
 		let _mirror_down_addr = addr & 0b0010_0000_0000_0111;
 		todo!("PPU implement")
 	    }
+	    0x8000..=0xFFFF => self.read_prg_rom(addr),
 	    _ => {
 		println!("Ignoring mem access at {:x}", addr);
 		0
