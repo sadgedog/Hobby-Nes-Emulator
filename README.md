@@ -1,7 +1,9 @@
 ## ABOUT THIS
 Hobby NES Emulator
 
-now can not run it (WIP)
+- How to run
+
+cargo run
 
 ![snake_game](./docs/snake_game.gif)
 
