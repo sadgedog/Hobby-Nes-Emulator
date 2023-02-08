@@ -1,9 +1,11 @@
 ## ABOUT THIS
 Hobby NES Emulator
 
+JMPとかを実装見ずに仕様書見て作ったからtrace.rsで盛大に不一致が起きてる(流石に土日)
+
 - How to run
 
-cargo run
+not work
 
 ![snake_game](./docs/snake_game.gif)
 
@@ -27,6 +29,8 @@ cargo test -- --nocapture
 EZ 6502 CPU SNAKE GAME ✅
 
 BUS ✅
+
+Cartridges ✅
 
 |Instructinon  |Check List|
 |--------------|----------|
@@ -90,7 +94,32 @@ BUS ✅
 
 - TODO
 
-Cartridges
+6502 CPU Illegal Instruction
+
+|Instructinon  |Check List|
+|--------------|----------|
+|AHX           |          |          
+|ALR           |          |
+|ANC           |          |
+|ANC           |          |
+|ARR           |          |
+|AXS           |          |
+|DCP           |          |
+|ISC           |          |
+|LAS           |          |
+|LAX           |          |
+|LAX           |          |
+|RLA           |          |
+|RRA           |          |
+|SAX           |          |
+|SBC           |          |
+|SHX           |          |
+|SHY           |          |
+|SLO           |          |
+|SRE           |          |
+|TAS           |          |
+|XAA           |          |
+
 
 PPU
 

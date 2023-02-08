@@ -95,7 +95,7 @@ impl CPU {
 	}
     }
 
-    fn get_operand_address(&self, mode: &AddressingMode) -> u16 {
+    pub fn get_absolute_address(&self, mode: &AddressingMode, addr: u16) -> u16 {
 	match mode {
 	    // LDA #$C0 -> A9 C0 (即値)
 	    AddressingMode::Immediate => self.program_counter,
@@ -144,10 +144,6 @@ impl CPU {
 		let deref = deref_base.wrapping_add(self.register_y as u16);
 		deref
 	    }
-	    // Undefined Addressing
-	    AddressingMode::NoneAddressing => {
-		panic!("mode {:?} is not supported", mode);
-	    }
 	    // Indirect for jump instruction
 	    AddressingMode::Indirect_jmp => {
 		let addr = self.mem_read_u16(self.program_counter);
@@ -161,6 +157,17 @@ impl CPU {
 		};
 		indirect_ref
 	    }
+	    // Undefined Addressing
+	    AddressingMode::NoneAddressing => {
+		panic!("mode {:?} is not supported", mode);
+	    }
+	}	
+    }
+
+    fn get_operand_address(&self, mode: &AddressingMode) -> u16 {
+	match mode {
+	    AddressingMode::Immediate => self.program_counter,
+	    _ => self.get_absolute_address(mode, self.program_counter),
 	}
     }
     
@@ -703,7 +710,7 @@ impl CPU {
 	    self.mem_write(0x0600 + i, program[i as usize]);
 	}
 	// self.mem_write_u16(0xFFFC, 0x8000);
-	self.mem_write_u16(0xFFFC, 0x0600);
+	// self.mem_write_u16(0xFFFC, 0x0600);
     }
 
     pub fn reset(&mut self) {
@@ -737,7 +744,7 @@ impl CPU {
 	    self.program_counter += 1;
 	    let program_counter_state = self.program_counter;
 	    // println!("{}", self.program_counter);
-	    let opcode = opcodes.get(&code).unwrap();//.expect(&format!("OpCode {:x} is not recognized", code));
+	    let opcode = opcodes.get(&code).expect(&format!("OpCode {:x} is not recognized", code));
 	    // println!("{:x}", code);
 
 	    match code {

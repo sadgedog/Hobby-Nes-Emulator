@@ -51,7 +51,8 @@ impl Mem for Bus {
 	    }
 	    PPU_REGISTERS ..= PPU_REGISTERS_MIRRORS_END => {
 		let _mirror_down_addr = addr & 0b0010_0000_0000_0111;
-		todo!("PPU implement")
+		// todo!("PPU implement")
+		0
 	    }
 	    0x8000..=0xFFFF => self.read_prg_rom(addr),
 	    _ => {
@@ -69,7 +70,7 @@ impl Mem for Bus {
 	    }
 	    PPU_REGISTERS ..= PPU_REGISTERS_MIRRORS_END => {
 		let _mirror_down_addr = addr & 0b0010_0000_0000_0111;
-		todo!("PPU implement");
+		// todo!("PPU implement");
 	    }
 	    _ => {
 		println!("Ignoring mem write-access at {:x}", addr);
