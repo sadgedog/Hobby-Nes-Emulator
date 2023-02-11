@@ -332,10 +332,18 @@ impl CPU {
 	} else {
 	    self.status &= !ZERO_FLAG;
 	}
-	let v7_bit = value & NEGATIVE_FLAG;
-	let v6_bit = value & OVERFLOW_FLAG;
-	self.status |= v7_bit;
-	self.status |= v6_bit;
+	// let v7_bit = value & NEGATIVE_FLAG; // 0b1000_0000
+	// let v6_bit = value & OVERFLOW_FLAG; // 0b0100_0000
+	if value & 0b1000_0000 > 0 {
+	    self.status |= NEGATIVE_FLAG;
+	} else {
+	    self.status &= !NEGATIVE_FLAG;
+	}
+	if value & 0b0100_0000 > 0 {
+	    self.status |= OVERFLOW_FLAG;
+	} else {
+	    self.status &= !OVERFLOW_FLAG;
+	}
     }
 
     fn bmi(&mut self) {
