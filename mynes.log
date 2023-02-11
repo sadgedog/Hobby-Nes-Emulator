@@ -5001,3 +5001,260 @@ C6B2  48        PHA                             A:FF X:97 Y:4E P:A5 SP:F9
 C6B3  A9 AA     LDA #$AA                        A:FF X:97 Y:4E P:A5 SP:F8
 C6B5  D0 05     BNE $C6BC                       A:AA X:97 Y:4E P:A5 SP:F8
 C6BC  28        PLP                             A:AA X:97 Y:4E P:A5 SP:F8
+C6BD  04 A9    *NOP $A9 = 00                    A:AA X:97 Y:4E P:EF SP:F9
+C6BF  44 A9    *NOP $A9 = 00                    A:AA X:97 Y:4E P:EF SP:F9
+C6C1  64 A9    *NOP $A9 = 00                    A:AA X:97 Y:4E P:EF SP:F9
+C6C3  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F9
+C6C4  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F9
+C6C5  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F9
+C6C6  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F9
+C6C7  08        PHP                             A:AA X:97 Y:4E P:EF SP:F9
+C6C8  48        PHA                             A:AA X:97 Y:4E P:EF SP:F8
+C6C9  0C A9 A9 *NOP $A9A9 = A9                  A:AA X:97 Y:4E P:EF SP:F7
+C6CC  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F7
+C6CD  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F7
+C6CE  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F7
+C6CF  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F7
+C6D0  08        PHP                             A:AA X:97 Y:4E P:EF SP:F7
+C6D1  48        PHA                             A:AA X:97 Y:4E P:EF SP:F6
+C6D2  14 A9    *NOP $A9,X @ 40 = 00             A:AA X:97 Y:4E P:EF SP:F5
+C6D4  34 A9    *NOP $A9,X @ 40 = 00             A:AA X:97 Y:4E P:EF SP:F5
+C6D6  54 A9    *NOP $A9,X @ 40 = 00             A:AA X:97 Y:4E P:EF SP:F5
+C6D8  74 A9    *NOP $A9,X @ 40 = 00             A:AA X:97 Y:4E P:EF SP:F5
+C6DA  D4 A9    *NOP $A9,X @ 40 = 00             A:AA X:97 Y:4E P:EF SP:F5
+C6DC  F4 A9    *NOP $A9,X @ 40 = 00             A:AA X:97 Y:4E P:EF SP:F5
+C6DE  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F5
+C6DF  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F5
+C6E0  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F5
+C6E1  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F5
+C6E2  08        PHP                             A:AA X:97 Y:4E P:EF SP:F5
+C6E3  48        PHA                             A:AA X:97 Y:4E P:EF SP:F4
+C6E4  1A       *NOP                             A:AA X:97 Y:4E P:EF SP:F3
+C6E5  3A       *NOP                             A:AA X:97 Y:4E P:EF SP:F3
+C6E6  5A       *NOP                             A:AA X:97 Y:4E P:EF SP:F3
+C6E7  7A       *NOP                             A:AA X:97 Y:4E P:EF SP:F3
+C6E8  DA       *NOP                             A:AA X:97 Y:4E P:EF SP:F3
+C6E9  FA       *NOP                             A:AA X:97 Y:4E P:EF SP:F3
+C6EA  80 89    *NOP #$89                        A:AA X:97 Y:4E P:EF SP:F3
+C6EC  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F3
+C6ED  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F3
+C6EE  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F3
+C6EF  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F3
+C6F0  08        PHP                             A:AA X:97 Y:4E P:EF SP:F3
+C6F1  48        PHA                             A:AA X:97 Y:4E P:EF SP:F2
+C6F2  1C A9 A9 *NOP $A9A9,X @ AA40 = 00         A:AA X:97 Y:4E P:EF SP:F1
+C6F5  3C A9 A9 *NOP $A9A9,X @ AA40 = 00         A:AA X:97 Y:4E P:EF SP:F1
+C6F8  5C A9 A9 *NOP $A9A9,X @ AA40 = 00         A:AA X:97 Y:4E P:EF SP:F1
+C6FB  7C A9 A9 *NOP $A9A9,X @ AA40 = 00         A:AA X:97 Y:4E P:EF SP:F1
+C6FE  DC A9 A9 *NOP $A9A9,X @ AA40 = 00         A:AA X:97 Y:4E P:EF SP:F1
+C701  FC A9 A9 *NOP $A9A9,X @ AA40 = 00         A:AA X:97 Y:4E P:EF SP:F1
+C704  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F1
+C705  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F1
+C706  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F1
+C707  EA        NOP                             A:AA X:97 Y:4E P:EF SP:F1
+C708  08        PHP                             A:AA X:97 Y:4E P:EF SP:F1
+C709  48        PHA                             A:AA X:97 Y:4E P:EF SP:F0
+C70A  A2 05     LDX #$05                        A:AA X:97 Y:4E P:EF SP:EF
+C70C  68        PLA                             A:AA X:05 Y:4E P:6D SP:EF
+C70D  C9 55     CMP #$55                        A:AA X:05 Y:4E P:ED SP:F0
+C70F  F0 0A     BEQ $C71B                       A:AA X:05 Y:4E P:6D SP:F0
+C711  C9 AA     CMP #$AA                        A:AA X:05 Y:4E P:6D SP:F0
+C713  F0 06     BEQ $C71B                       A:AA X:05 Y:4E P:6F SP:F0
+C71B  68        PLA                             A:AA X:05 Y:4E P:6F SP:F0
+C71C  29 CB     AND #$CB                        A:FF X:05 Y:4E P:ED SP:F1
+C71E  C9 00     CMP #$00                        A:CB X:05 Y:4E P:ED SP:F1
+C720  F0 06     BEQ $C728                       A:CB X:05 Y:4E P:ED SP:F1
+C722  C9 CB     CMP #$CB                        A:CB X:05 Y:4E P:ED SP:F1
+C724  F0 02     BEQ $C728                       A:CB X:05 Y:4E P:6F SP:F1
+C728  C8        INY                             A:CB X:05 Y:4E P:6F SP:F1
+C729  CA        DEX                             A:CB X:05 Y:4F P:6D SP:F1
+C72A  D0 E0     BNE $C70C                       A:CB X:04 Y:4F P:6D SP:F1
+C70C  68        PLA                             A:CB X:04 Y:4F P:6D SP:F1
+C70D  C9 55     CMP #$55                        A:AA X:04 Y:4F P:ED SP:F2
+C70F  F0 0A     BEQ $C71B                       A:AA X:04 Y:4F P:6D SP:F2
+C711  C9 AA     CMP #$AA                        A:AA X:04 Y:4F P:6D SP:F2
+C713  F0 06     BEQ $C71B                       A:AA X:04 Y:4F P:6F SP:F2
+C71B  68        PLA                             A:AA X:04 Y:4F P:6F SP:F2
+C71C  29 CB     AND #$CB                        A:FF X:04 Y:4F P:ED SP:F3
+C71E  C9 00     CMP #$00                        A:CB X:04 Y:4F P:ED SP:F3
+C720  F0 06     BEQ $C728                       A:CB X:04 Y:4F P:ED SP:F3
+C722  C9 CB     CMP #$CB                        A:CB X:04 Y:4F P:ED SP:F3
+C724  F0 02     BEQ $C728                       A:CB X:04 Y:4F P:6F SP:F3
+C728  C8        INY                             A:CB X:04 Y:4F P:6F SP:F3
+C729  CA        DEX                             A:CB X:04 Y:50 P:6D SP:F3
+C72A  D0 E0     BNE $C70C                       A:CB X:03 Y:50 P:6D SP:F3
+C70C  68        PLA                             A:CB X:03 Y:50 P:6D SP:F3
+C70D  C9 55     CMP #$55                        A:AA X:03 Y:50 P:ED SP:F4
+C70F  F0 0A     BEQ $C71B                       A:AA X:03 Y:50 P:6D SP:F4
+C711  C9 AA     CMP #$AA                        A:AA X:03 Y:50 P:6D SP:F4
+C713  F0 06     BEQ $C71B                       A:AA X:03 Y:50 P:6F SP:F4
+C71B  68        PLA                             A:AA X:03 Y:50 P:6F SP:F4
+C71C  29 CB     AND #$CB                        A:FF X:03 Y:50 P:ED SP:F5
+C71E  C9 00     CMP #$00                        A:CB X:03 Y:50 P:ED SP:F5
+C720  F0 06     BEQ $C728                       A:CB X:03 Y:50 P:ED SP:F5
+C722  C9 CB     CMP #$CB                        A:CB X:03 Y:50 P:ED SP:F5
+C724  F0 02     BEQ $C728                       A:CB X:03 Y:50 P:6F SP:F5
+C728  C8        INY                             A:CB X:03 Y:50 P:6F SP:F5
+C729  CA        DEX                             A:CB X:03 Y:51 P:6D SP:F5
+C72A  D0 E0     BNE $C70C                       A:CB X:02 Y:51 P:6D SP:F5
+C70C  68        PLA                             A:CB X:02 Y:51 P:6D SP:F5
+C70D  C9 55     CMP #$55                        A:AA X:02 Y:51 P:ED SP:F6
+C70F  F0 0A     BEQ $C71B                       A:AA X:02 Y:51 P:6D SP:F6
+C711  C9 AA     CMP #$AA                        A:AA X:02 Y:51 P:6D SP:F6
+C713  F0 06     BEQ $C71B                       A:AA X:02 Y:51 P:6F SP:F6
+C71B  68        PLA                             A:AA X:02 Y:51 P:6F SP:F6
+C71C  29 CB     AND #$CB                        A:FF X:02 Y:51 P:ED SP:F7
+C71E  C9 00     CMP #$00                        A:CB X:02 Y:51 P:ED SP:F7
+C720  F0 06     BEQ $C728                       A:CB X:02 Y:51 P:ED SP:F7
+C722  C9 CB     CMP #$CB                        A:CB X:02 Y:51 P:ED SP:F7
+C724  F0 02     BEQ $C728                       A:CB X:02 Y:51 P:6F SP:F7
+C728  C8        INY                             A:CB X:02 Y:51 P:6F SP:F7
+C729  CA        DEX                             A:CB X:02 Y:52 P:6D SP:F7
+C72A  D0 E0     BNE $C70C                       A:CB X:01 Y:52 P:6D SP:F7
+C70C  68        PLA                             A:CB X:01 Y:52 P:6D SP:F7
+C70D  C9 55     CMP #$55                        A:AA X:01 Y:52 P:ED SP:F8
+C70F  F0 0A     BEQ $C71B                       A:AA X:01 Y:52 P:6D SP:F8
+C711  C9 AA     CMP #$AA                        A:AA X:01 Y:52 P:6D SP:F8
+C713  F0 06     BEQ $C71B                       A:AA X:01 Y:52 P:6F SP:F8
+C71B  68        PLA                             A:AA X:01 Y:52 P:6F SP:F8
+C71C  29 CB     AND #$CB                        A:FF X:01 Y:52 P:ED SP:F9
+C71E  C9 00     CMP #$00                        A:CB X:01 Y:52 P:ED SP:F9
+C720  F0 06     BEQ $C728                       A:CB X:01 Y:52 P:ED SP:F9
+C722  C9 CB     CMP #$CB                        A:CB X:01 Y:52 P:ED SP:F9
+C724  F0 02     BEQ $C728                       A:CB X:01 Y:52 P:6F SP:F9
+C728  C8        INY                             A:CB X:01 Y:52 P:6F SP:F9
+C729  CA        DEX                             A:CB X:01 Y:53 P:6D SP:F9
+C72A  D0 E0     BNE $C70C                       A:CB X:00 Y:53 P:6F SP:F9
+C72C  60        RTS                             A:CB X:00 Y:53 P:6F SP:F9
+C6AC  20 B7 C6  JSR $C6B7                       A:CB X:00 Y:53 P:6F SP:FB
+C6B7  A9 34     LDA #$34                        A:CB X:00 Y:53 P:6F SP:F9
+C6B9  48        PHA                             A:34 X:00 Y:53 P:6D SP:F9
+C6BA  A9 55     LDA #$55                        A:34 X:00 Y:53 P:6D SP:F8
+C6BC  28        PLP                             A:55 X:00 Y:53 P:6D SP:F8
+C6BD  04 A9    *NOP $A9 = 00                    A:55 X:00 Y:53 P:24 SP:F9
+C6BF  44 A9    *NOP $A9 = 00                    A:55 X:00 Y:53 P:24 SP:F9
+C6C1  64 A9    *NOP $A9 = 00                    A:55 X:00 Y:53 P:24 SP:F9
+C6C3  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F9
+C6C4  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F9
+C6C5  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F9
+C6C6  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F9
+C6C7  08        PHP                             A:55 X:00 Y:53 P:24 SP:F9
+C6C8  48        PHA                             A:55 X:00 Y:53 P:24 SP:F8
+C6C9  0C A9 A9 *NOP $A9A9 = A9                  A:55 X:00 Y:53 P:24 SP:F7
+C6CC  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F7
+C6CD  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F7
+C6CE  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F7
+C6CF  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F7
+C6D0  08        PHP                             A:55 X:00 Y:53 P:24 SP:F7
+C6D1  48        PHA                             A:55 X:00 Y:53 P:24 SP:F6
+C6D2  14 A9    *NOP $A9,X @ A9 = 00             A:55 X:00 Y:53 P:24 SP:F5
+C6D4  34 A9    *NOP $A9,X @ A9 = 00             A:55 X:00 Y:53 P:24 SP:F5
+C6D6  54 A9    *NOP $A9,X @ A9 = 00             A:55 X:00 Y:53 P:24 SP:F5
+C6D8  74 A9    *NOP $A9,X @ A9 = 00             A:55 X:00 Y:53 P:24 SP:F5
+C6DA  D4 A9    *NOP $A9,X @ A9 = 00             A:55 X:00 Y:53 P:24 SP:F5
+C6DC  F4 A9    *NOP $A9,X @ A9 = 00             A:55 X:00 Y:53 P:24 SP:F5
+C6DE  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F5
+C6DF  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F5
+C6E0  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F5
+C6E1  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F5
+C6E2  08        PHP                             A:55 X:00 Y:53 P:24 SP:F5
+C6E3  48        PHA                             A:55 X:00 Y:53 P:24 SP:F4
+C6E4  1A       *NOP                             A:55 X:00 Y:53 P:24 SP:F3
+C6E5  3A       *NOP                             A:55 X:00 Y:53 P:24 SP:F3
+C6E6  5A       *NOP                             A:55 X:00 Y:53 P:24 SP:F3
+C6E7  7A       *NOP                             A:55 X:00 Y:53 P:24 SP:F3
+C6E8  DA       *NOP                             A:55 X:00 Y:53 P:24 SP:F3
+C6E9  FA       *NOP                             A:55 X:00 Y:53 P:24 SP:F3
+C6EA  80 89    *NOP #$89                        A:55 X:00 Y:53 P:24 SP:F3
+C6EC  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F3
+C6ED  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F3
+C6EE  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F3
+C6EF  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F3
+C6F0  08        PHP                             A:55 X:00 Y:53 P:24 SP:F3
+C6F1  48        PHA                             A:55 X:00 Y:53 P:24 SP:F2
+C6F2  1C A9 A9 *NOP $A9A9,X @ A9A9 = A9         A:55 X:00 Y:53 P:24 SP:F1
+C6F5  3C A9 A9 *NOP $A9A9,X @ A9A9 = A9         A:55 X:00 Y:53 P:24 SP:F1
+C6F8  5C A9 A9 *NOP $A9A9,X @ A9A9 = A9         A:55 X:00 Y:53 P:24 SP:F1
+C6FB  7C A9 A9 *NOP $A9A9,X @ A9A9 = A9         A:55 X:00 Y:53 P:24 SP:F1
+C6FE  DC A9 A9 *NOP $A9A9,X @ A9A9 = A9         A:55 X:00 Y:53 P:24 SP:F1
+C701  FC A9 A9 *NOP $A9A9,X @ A9A9 = A9         A:55 X:00 Y:53 P:24 SP:F1
+C704  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F1
+C705  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F1
+C706  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F1
+C707  EA        NOP                             A:55 X:00 Y:53 P:24 SP:F1
+C708  08        PHP                             A:55 X:00 Y:53 P:24 SP:F1
+C709  48        PHA                             A:55 X:00 Y:53 P:24 SP:F0
+C70A  A2 05     LDX #$05                        A:55 X:00 Y:53 P:24 SP:EF
+C70C  68        PLA                             A:55 X:05 Y:53 P:24 SP:EF
+C70D  C9 55     CMP #$55                        A:55 X:05 Y:53 P:24 SP:F0
+C70F  F0 0A     BEQ $C71B                       A:55 X:05 Y:53 P:27 SP:F0
+C71B  68        PLA                             A:55 X:05 Y:53 P:27 SP:F0
+C71C  29 CB     AND #$CB                        A:34 X:05 Y:53 P:25 SP:F1
+C71E  C9 00     CMP #$00                        A:00 X:05 Y:53 P:27 SP:F1
+C720  F0 06     BEQ $C728                       A:00 X:05 Y:53 P:27 SP:F1
+C728  C8        INY                             A:00 X:05 Y:53 P:27 SP:F1
+C729  CA        DEX                             A:00 X:05 Y:54 P:25 SP:F1
+C72A  D0 E0     BNE $C70C                       A:00 X:04 Y:54 P:25 SP:F1
+C70C  68        PLA                             A:00 X:04 Y:54 P:25 SP:F1
+C70D  C9 55     CMP #$55                        A:55 X:04 Y:54 P:25 SP:F2
+C70F  F0 0A     BEQ $C71B                       A:55 X:04 Y:54 P:27 SP:F2
+C71B  68        PLA                             A:55 X:04 Y:54 P:27 SP:F2
+C71C  29 CB     AND #$CB                        A:34 X:04 Y:54 P:25 SP:F3
+C71E  C9 00     CMP #$00                        A:00 X:04 Y:54 P:27 SP:F3
+C720  F0 06     BEQ $C728                       A:00 X:04 Y:54 P:27 SP:F3
+C728  C8        INY                             A:00 X:04 Y:54 P:27 SP:F3
+C729  CA        DEX                             A:00 X:04 Y:55 P:25 SP:F3
+C72A  D0 E0     BNE $C70C                       A:00 X:03 Y:55 P:25 SP:F3
+C70C  68        PLA                             A:00 X:03 Y:55 P:25 SP:F3
+C70D  C9 55     CMP #$55                        A:55 X:03 Y:55 P:25 SP:F4
+C70F  F0 0A     BEQ $C71B                       A:55 X:03 Y:55 P:27 SP:F4
+C71B  68        PLA                             A:55 X:03 Y:55 P:27 SP:F4
+C71C  29 CB     AND #$CB                        A:34 X:03 Y:55 P:25 SP:F5
+C71E  C9 00     CMP #$00                        A:00 X:03 Y:55 P:27 SP:F5
+C720  F0 06     BEQ $C728                       A:00 X:03 Y:55 P:27 SP:F5
+C728  C8        INY                             A:00 X:03 Y:55 P:27 SP:F5
+C729  CA        DEX                             A:00 X:03 Y:56 P:25 SP:F5
+C72A  D0 E0     BNE $C70C                       A:00 X:02 Y:56 P:25 SP:F5
+C70C  68        PLA                             A:00 X:02 Y:56 P:25 SP:F5
+C70D  C9 55     CMP #$55                        A:55 X:02 Y:56 P:25 SP:F6
+C70F  F0 0A     BEQ $C71B                       A:55 X:02 Y:56 P:27 SP:F6
+C71B  68        PLA                             A:55 X:02 Y:56 P:27 SP:F6
+C71C  29 CB     AND #$CB                        A:34 X:02 Y:56 P:25 SP:F7
+C71E  C9 00     CMP #$00                        A:00 X:02 Y:56 P:27 SP:F7
+C720  F0 06     BEQ $C728                       A:00 X:02 Y:56 P:27 SP:F7
+C728  C8        INY                             A:00 X:02 Y:56 P:27 SP:F7
+C729  CA        DEX                             A:00 X:02 Y:57 P:25 SP:F7
+C72A  D0 E0     BNE $C70C                       A:00 X:01 Y:57 P:25 SP:F7
+C70C  68        PLA                             A:00 X:01 Y:57 P:25 SP:F7
+C70D  C9 55     CMP #$55                        A:55 X:01 Y:57 P:25 SP:F8
+C70F  F0 0A     BEQ $C71B                       A:55 X:01 Y:57 P:27 SP:F8
+C71B  68        PLA                             A:55 X:01 Y:57 P:27 SP:F8
+C71C  29 CB     AND #$CB                        A:34 X:01 Y:57 P:25 SP:F9
+C71E  C9 00     CMP #$00                        A:00 X:01 Y:57 P:27 SP:F9
+C720  F0 06     BEQ $C728                       A:00 X:01 Y:57 P:27 SP:F9
+C728  C8        INY                             A:00 X:01 Y:57 P:27 SP:F9
+C729  CA        DEX                             A:00 X:01 Y:58 P:25 SP:F9
+C72A  D0 E0     BNE $C70C                       A:00 X:00 Y:58 P:27 SP:F9
+C72C  60        RTS                             A:00 X:00 Y:58 P:27 SP:F9
+C6AF  60        RTS                             A:00 X:00 Y:58 P:27 SP:FB
+C632  20 1E E5  JSR $E51E                       A:00 X:00 Y:58 P:27 SP:FD
+E51E  A9 55     LDA #$55                        A:00 X:00 Y:58 P:27 SP:FB
+E520  8D 80 05  STA $0580 = 00                  A:55 X:00 Y:58 P:25 SP:FB
+E523  A9 AA     LDA #$AA                        A:55 X:00 Y:58 P:25 SP:FB
+E525  8D 32 04  STA $0432 = 00                  A:AA X:00 Y:58 P:A5 SP:FB
+E528  A9 80     LDA #$80                        A:AA X:00 Y:58 P:A5 SP:FB
+E52A  85 43     STA $43 = 00                    A:80 X:00 Y:58 P:A5 SP:FB
+E52C  A9 05     LDA #$05                        A:80 X:00 Y:58 P:A5 SP:FB
+E52E  85 44     STA $44 = 00                    A:05 X:00 Y:58 P:25 SP:FB
+E530  A9 32     LDA #$32                        A:05 X:00 Y:58 P:25 SP:FB
+E532  85 45     STA $45 = 00                    A:32 X:00 Y:58 P:25 SP:FB
+E534  A9 04     LDA #$04                        A:32 X:00 Y:58 P:25 SP:FB
+E536  85 46     STA $46 = 00                    A:04 X:00 Y:58 P:25 SP:FB
+E538  A2 03     LDX #$03                        A:04 X:00 Y:58 P:25 SP:FB
+E53A  A0 77     LDY #$77                        A:04 X:03 Y:58 P:25 SP:FB
+E53C  A9 FF     LDA #$FF                        A:04 X:03 Y:77 P:25 SP:FB
+E53E  85 01     STA $01 = FF                    A:FF X:03 Y:77 P:A5 SP:FB
+E540  24 01     BIT $01 = FF                    A:FF X:03 Y:77 P:A5 SP:FB
+E542  38        SEC                             A:FF X:03 Y:77 P:E5 SP:FB
+E543  A9 00     LDA #$00                        A:FF X:03 Y:77 P:E5 SP:FB
+E545  A3 40    *LAX ($40,X) @ 43 = 0580 = 55    A:00 X:03 Y:77 P:67 SP:FB

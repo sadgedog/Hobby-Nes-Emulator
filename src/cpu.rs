@@ -534,7 +534,9 @@ impl CPU {
 	value
     }
 
-    fn nop(&mut self) {} // nothing
+    fn nop(&mut self) {
+	return
+    }
 
     fn ora(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(mode);
@@ -708,6 +710,15 @@ impl CPU {
 	self.register_a = self.register_y;
 	self.update_zero_and_negative_flags(self.register_a);
     }
+
+    fn nop_dop(&mut self) {
+	return
+    }
+
+    fn nop_top(&mut self) {
+	return
+    }
+
 
     pub fn load_and_run(&mut self, program: Vec<u8>) {
 	self.load(program);
@@ -928,6 +939,22 @@ impl CPU {
 		0x9A => self.txs(),
 		// TYA (Transfer Y to Accumulator)
 		0x98 => self.tya(),
+
+		// *NOP(DOP) (No Operation)
+		0x04 | 0x14 | 0x34 | 0x44 | 0x54 | 0x64 | 0x74 |
+		0x80 | 0x82 | 0x89 | 0xC2 | 0xD4 | 0xE2 | 0xF4 =>
+		    // let addr = self.get_operand_address(&opcode.mode);
+		    // let value = self.mem_read(addr);
+		    // do nothing
+		    self.nop_dop(),
+		// *NOP(NOP)
+		0x1A | 0x3A | 0x5A | 0x7A | 0xDA | 0xFA => self.nop(),
+		// *NOP(TOP)
+		0x0C | 0x1C | 0x3C | 0x5C | 0x7C | 0xDC | 0xFC => {
+		    self.nop_top();
+		}
+
+		
 		// other opecode (crash)
 		_ => self.crash(),
 	    }

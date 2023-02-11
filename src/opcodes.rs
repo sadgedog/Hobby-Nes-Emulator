@@ -230,12 +230,136 @@ lazy_static! {
 
 	OpCode::new(0x98, "TYA", 1, 2, AddressingMode::NoneAddressing),
 
-
 	// extra illegal instructions
-	
-
-
-	
+	//     AAC (ANC) [ANC] - (anc)
+	OpCode::new(0x0B, "*ANC", 2, 2, AddressingMode::Immediate),
+	OpCode::new(0x2B, "*ANC", 2, 2, AddressingMode::Immediate),
+	//     AAX (SAX) [AXS] - (sax)
+	OpCode::new(0x87, "*SAX", 2, 3, AddressingMode::ZeroPage),
+	OpCode::new(0x97, "*SAX", 2, 4, AddressingMode::ZeroPage_Y),
+	OpCode::new(0x83, "*SAX", 2, 6, AddressingMode::Indirect_Y),
+	OpCode::new(0x8F, "*SAX", 3, 4, AddressingMode::Absolute),
+	//     ARR (ARR) [ARR] -
+	OpCode::new(0x6B, "*ARR", 2, 2, AddressingMode::Immediate),
+	//     ASR (ASR) [ALR] - (alr)
+	OpCode::new(0x4B, "*ASR", 2, 2, AddressingMode::Immediate),
+	//     ATX (LXA) [OAL] - (lxa)
+	OpCode::new(0xAB, "*LXA", 2, 3, AddressingMode::Immediate),
+	//     AXA (SHA) [AXA] - (ahx)
+	OpCode::new(0x9F, "*AHX", 3, 5, AddressingMode::Absolute_Y), // 4 or 5
+	OpCode::new(0x93, "*AHX", 2, 6, AddressingMode::Indirect_Y), // 6 -> 8?
+	//     AXS (SBX) [SAX] -
+	OpCode::new(0xCB, "*AXS", 2, 2, AddressingMode::Immediate),
+	//     DCP (DCP) [DCM] -
+	OpCode::new(0xC7, "*DCP", 2, 5, AddressingMode::ZeroPage),
+	OpCode::new(0xD7, "*DCP", 2, 6, AddressingMode::ZeroPage_X),
+	OpCode::new(0xCF, "*DCP", 3, 6, AddressingMode::Absolute),
+	OpCode::new(0xDF, "*DCP", 3, 7, AddressingMode::Absolute_X),
+	OpCode::new(0xDB, "*DCP", 3, 7, AddressingMode::Absolute_Y),
+	OpCode::new(0xC3, "*DCP", 2, 8, AddressingMode::Indirect_X),
+	OpCode::new(0xD3, "*DCP", 2, 8, AddressingMode::Indirect_Y),
+	//     DOP (NOP) [SKB] - (nop)
+	OpCode::new(0x04, "*NOP", 2, 3, AddressingMode::ZeroPage),
+	OpCode::new(0x14, "*NOP", 2, 4, AddressingMode::ZeroPage_X),
+	OpCode::new(0x34, "*NOP", 2, 4, AddressingMode::ZeroPage_X),
+	OpCode::new(0x44, "*NOP", 2, 3, AddressingMode::ZeroPage),
+	OpCode::new(0x54, "*NOP", 2, 4, AddressingMode::ZeroPage_X),
+	OpCode::new(0x64, "*NOP", 2, 3, AddressingMode::ZeroPage),
+	OpCode::new(0x74, "*NOP", 2, 3, AddressingMode::ZeroPage_X),
+	OpCode::new(0x80, "*NOP", 2, 3, AddressingMode::Immediate),
+	OpCode::new(0x82, "*NOP", 2, 2, AddressingMode::Immediate),
+	OpCode::new(0x89, "*NOP", 2, 2, AddressingMode::Immediate),
+	OpCode::new(0xC2, "*NOP", 2, 2, AddressingMode::Immediate),
+	OpCode::new(0xD4, "*NOP", 2, 4, AddressingMode::ZeroPage_X),
+	OpCode::new(0xE2, "*NOP", 2, 2, AddressingMode::Immediate),
+	OpCode::new(0xF4, "*NOP", 2, 4, AddressingMode::ZeroPage_X),
+	//     ISC (ISB) [INS] - (isb)
+	OpCode::new(0xE7, "*ISB", 2, 5, AddressingMode::ZeroPage),
+	OpCode::new(0xF7, "*ISB", 2, 6, AddressingMode::ZeroPage_X),
+	OpCode::new(0xEF, "*ISB", 3, 6, AddressingMode::Absolute),
+	OpCode::new(0xFF, "*ISB", 3, 7, AddressingMode::Absolute_X),
+	OpCode::new(0xFB, "*ISB", 3, 7, AddressingMode::Absolute_Y),
+	OpCode::new(0xE3, "*ISB", 2, 8, AddressingMode::Indirect_X),
+	OpCode::new(0xF3, "*ISB", 2, 8, AddressingMode::Indirect_Y),	
+	//     KIL (JAM) [HLT] - (nop?)
+	OpCode::new(0x02, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0x12, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0x22, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0x32, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0x42, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0x52, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0x62, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0x72, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0x92, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0xB2, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0xD2, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0xF2, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	//     LAR (LAE) [LAS] - (las)
+	OpCode::new(0xBB, "*LAS", 3, 4, AddressingMode::Absolute_Y),
+	//     LAX (LAX) [LAX] -
+	OpCode::new(0xA7, "*LAX", 2, 3, AddressingMode::ZeroPage),
+	OpCode::new(0xB7, "*LAX", 2, 4, AddressingMode::ZeroPage_Y),
+	OpCode::new(0xAF, "*LAX", 3, 4, AddressingMode::Absolute),
+	OpCode::new(0xBF, "*LAX", 3, 4, AddressingMode::Absolute_Y),
+	OpCode::new(0xA3, "*LAX", 2, 6, AddressingMode::Indirect_X),
+	OpCode::new(0xB3, "*LAX", 2, 5, AddressingMode::Indirect_Y),	
+	//     NOP (NOP) [NOP] -
+	OpCode::new(0x1A, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0x3A, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0x5A, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0x7A, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0xDA, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	OpCode::new(0xFA, "*NOP", 1, 2, AddressingMode::NoneAddressing),
+	//     RLA (RLA) [RLA] -
+	OpCode::new(0x27, "*RLA", 2, 5, AddressingMode::ZeroPage),
+	OpCode::new(0x37, "*RLA", 2, 6, AddressingMode::ZeroPage_X),
+	OpCode::new(0x2F, "*RLA", 3, 6, AddressingMode::Absolute),
+	OpCode::new(0x3F, "*RLA", 3, 7, AddressingMode::Absolute_X),
+	OpCode::new(0x3B, "*RLA", 3, 7, AddressingMode::Absolute_Y),
+	OpCode::new(0x23, "*RLA", 2, 8, AddressingMode::Indirect_X),
+	OpCode::new(0x33, "*RLA", 2, 8, AddressingMode::Indirect_Y),
+	//     RRA (RRA) [RRA] -
+	OpCode::new(0x67, "*RRA", 2, 5, AddressingMode::ZeroPage),
+	OpCode::new(0x77, "*RRA", 2, 6, AddressingMode::ZeroPage_X),
+	OpCode::new(0x6F, "*RRA", 3, 6, AddressingMode::Absolute),
+	OpCode::new(0x7F, "*RRA", 3, 7, AddressingMode::Absolute_X),
+	OpCode::new(0x7B, "*RRA", 3, 7, AddressingMode::Absolute_Y),
+	OpCode::new(0x63, "*RRA", 2, 8, AddressingMode::Indirect_X),
+	OpCode::new(0x73, "*RRA", 2, 8, AddressingMode::Indirect_Y),
+	//     SBC (SBC) [SBC] -
+	OpCode::new(0xEB, "*SBC", 2, 2, AddressingMode::Immediate),
+	//     SLO (SLO) [ASO] -
+	OpCode::new(0x07, "*SLO", 2, 5, AddressingMode::ZeroPage),
+	OpCode::new(0x17, "*SLO", 2, 6, AddressingMode::ZeroPage_X),
+	OpCode::new(0x0F, "*SLO", 3, 6, AddressingMode::Absolute),
+	OpCode::new(0x1F, "*SLO", 3, 7, AddressingMode::Absolute_X),
+	OpCode::new(0x1B, "*SLO", 3, 7, AddressingMode::Absolute_Y),
+	OpCode::new(0x03, "*SLO", 2, 8, AddressingMode::Indirect_X),
+	OpCode::new(0x13, "*SLO", 2, 8, AddressingMode::Indirect_Y),
+	//     SRE (SRE) [LSE] -
+	OpCode::new(0x47, "*SRE", 2, 5, AddressingMode::ZeroPage),
+	OpCode::new(0x57, "*SRE", 2, 6, AddressingMode::ZeroPage_X),
+	OpCode::new(0x4F, "*SRE", 3, 6, AddressingMode::Absolute),
+	OpCode::new(0x5F, "*SRE", 3, 7, AddressingMode::Absolute_X),
+	OpCode::new(0x5B, "*SRE", 3, 7, AddressingMode::Absolute_Y),
+	OpCode::new(0x43, "*SRE", 2, 8, AddressingMode::Indirect_X),
+	OpCode::new(0x53, "*SRE", 2, 8, AddressingMode::Indirect_Y),
+	//     SXA (SHX) [XAS] - (shx)
+	OpCode::new(0x9E, "*SHX", 3, 4, AddressingMode::Absolute_Y), // 4 or 5
+	//     SYA (SHY) [SAY] - (shy)
+	OpCode::new(0x9C, "*SHY", 3, 4, AddressingMode::Absolute_X), // 4 or 5
+	//     TOP (NOP) [SKW] - (nop)
+	OpCode::new(0x0C, "*NOP", 3, 4, AddressingMode::Absolute),
+	OpCode::new(0x1C, "*NOP", 3, 4, AddressingMode::Absolute_X),
+	OpCode::new(0x3C, "*NOP", 3, 4, AddressingMode::Absolute_X),
+	OpCode::new(0x5C, "*NOP", 3, 4, AddressingMode::Absolute_X),
+	OpCode::new(0x7C, "*NOP", 3, 4, AddressingMode::Absolute_X),
+	OpCode::new(0xDC, "*NOP", 3, 4, AddressingMode::Absolute_X),
+	OpCode::new(0xFC, "*NOP", 3, 4, AddressingMode::Absolute_X),
+	//     XAA (ANE) [XAA] -
+	OpCode::new(0x8B, "*XAA", 2, 3, AddressingMode::Immediate),
+	//     XAS (SHS) [TAS] - (tas)
+	OpCode::new(0x9B, "*TAS", 3, 2, AddressingMode::Absolute_Y), // 5?
     ];
     
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
