@@ -1,8 +1,6 @@
 ## ABOUT THIS
 Hobby NES Emulator
 
-JMPとかを実装見ずに仕様書見て作ったからtrace.rsで盛大に不一致が起きてる(流石に土日)
-
 - How to run
 
 not work

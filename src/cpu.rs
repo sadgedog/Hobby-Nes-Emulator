@@ -100,36 +100,36 @@ impl CPU {
 	    // LDA #$C0 -> A9 C0 (即値)
 	    AddressingMode::Immediate => self.program_counter,
 	    // LDA $C0 -> A5 C0 (0xC0にある値をA_registerに代入 0 ~ 255)
-	    AddressingMode::ZeroPage => self.mem_read(self.program_counter) as u16,
+	    AddressingMode::ZeroPage => self.mem_read(addr) as u16,
 	    // LDA $C000 -> AD 00 C0 (0xC000にある値をA_registerに代入 (0x0000~0xFFFFまで全て))
-	    AddressingMode::Absolute => self.mem_read_u16(self.program_counter),
+	    AddressingMode::Absolute => self.mem_read_u16(addr),
 	    // LDA $C0,X -> A5 C0+X (C0にregister_xの値を加算した場所の値をA_registerに代入) 
 	    AddressingMode::ZeroPage_X => {
-		let pos = self.mem_read(self.program_counter);
+		let pos = self.mem_read(addr);
 		let addr = pos.wrapping_add(self.register_x) as u16;
 		addr
 	    }
 	    // LDA $C0,Y -> A5 C0+Y (C0にregister_yの値を加算した場所の値をA_registerに代入) 
 	    AddressingMode::ZeroPage_Y => {
-		let pos = self.mem_read(self.program_counter);
+		let pos = self.mem_read(addr);
 		let addr = pos.wrapping_add(self.register_y) as u16;
 		addr
 	    }
 	    // LDA $C000,X -> BD 00 C0 (C000にregister_xの値を加算した場所の値をA_registerに代入)
 	    AddressingMode::Absolute_X => {
-		let base = self.mem_read_u16(self.program_counter);
+		let base = self.mem_read_u16(addr);
 		let addr = base.wrapping_add(self.register_x as u16);
 		addr
 	    }
 	    // LDA $C000,Y -> B9 00 C0 (C000にregister_yの値を加算した場所の値をA_registerに代入)
 	    AddressingMode::Absolute_Y => {
-		let base = self.mem_read_u16(self.program_counter);
+		let base = self.mem_read_u16(addr);
 		let addr = base.wrapping_add(self.register_y as u16);
 		addr
 	    }
 	    // LDA ($C0,X) -> A1 C0+X+1
 	    AddressingMode::Indirect_X => {
-		let base = self.mem_read(self.program_counter);
+		let base = self.mem_read(addr);
 		let ptr: u8 = (base as u8).wrapping_add(self.register_x);
 		let lo = self.mem_read(ptr as u16);
 		let hi = self.mem_read(ptr.wrapping_add(1) as u16);
@@ -137,7 +137,8 @@ impl CPU {
 	    }
 	    // LDA ($C0,Y) -> B1 C0+1+Y
 	    AddressingMode::Indirect_Y => {
-		let base = self.mem_read(self.program_counter);
+		// let base = self.mem_read(self.program_counter);
+		let base = self.mem_read(addr);
 		let lo = self.mem_read(base as u16);
 		let hi = self.mem_read((base as u8).wrapping_add(1) as u16);
 		let deref_base = (hi as u16) << 8 | (lo as u16);
@@ -212,7 +213,7 @@ impl CPU {
 	    self.status = self.status & !ZERO_FLAG;
 	}
 
-	if result & 0b1000_0000 != 0 {
+	if result & 0b1000_0000 == 1 {
 	    self.status = self.status | NEGATIVE_FLAG;
 	} else {
 	    self.status = self.status & !NEGATIVE_FLAG;
@@ -739,6 +740,7 @@ impl CPU {
     {
 	let ref opcodes: HashMap<u8, &'static opcodes::OpCode> = *opcodes::OPCODES_MAP;
 	loop {
+	    callback(self);
 	    // 0x8000の値(命令)を読み込む
 	    let code = self.mem_read(self.program_counter);
 	    self.program_counter += 1;
@@ -922,7 +924,7 @@ impl CPU {
 	    if program_counter_state == self.program_counter {
 		self.program_counter += (opcode.len - 1) as u16;
 	    }
-	    callback(self);
+	    // callback(self);
 	}
     }
 }

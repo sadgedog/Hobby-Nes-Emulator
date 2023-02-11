@@ -57,9 +57,13 @@ pub fn trace(cpu: &CPU) -> String {
                     mem_addr,
                     stored_value
                 ),
-		AddressingMode::Indirect_jmp => {
-		    todo!("JMP inst")
-		}
+		AddressingMode::Indirect_jmp => format!(
+		    "(${:02x},X) @ {:02x} = {:04x} = {:02x}",
+                    address,
+                    (address.wrapping_add(cpu.register_x)),
+                    mem_addr,
+                    stored_value
+		),
                 AddressingMode::NoneAddressing => {
                     // assuming local jumps: BNE, BVS, etc....
                     let address: usize =
@@ -98,7 +102,9 @@ pub fn trace(cpu: &CPU) -> String {
                         format!("${:04x}", address)
                     }
                 }
-                AddressingMode::Absolute => format!("${:04x} = {:02x}", mem_addr, stored_value),
+                AddressingMode::Absolute => format!(
+		    "${:04x} = {:02x}", mem_addr, stored_value
+		),
                 AddressingMode::Absolute_X => format!(
                     "${:04x},X @ {:04x} = {:02x}",
                     address, mem_addr, stored_value
