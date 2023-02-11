@@ -405,10 +405,10 @@ impl CPU {
     }
 
     fn compare(&mut self, cmp_data: u8, value: u8) {
-	if cmp_data == value {
-	    self.status |= ZERO_FLAG;
-	} else if cmp_data >= value {
+	if cmp_data >= value {
 	    self.status |= CARRY_FLAG;
+	} else {
+	    self.status &= !CARRY_FLAG;
 	}
 	let res = cmp_data.wrapping_sub(value);
 	self.update_zero_and_negative_flags(res);
