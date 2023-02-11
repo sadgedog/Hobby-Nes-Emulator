@@ -715,6 +715,13 @@ impl CPU {
 	return
     }
 
+    fn lax(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	self.set_register_a(value);
+	self.register_x = self.register_a;
+    }
+    
     fn nop_top(&mut self) {
 	return
     }
@@ -949,6 +956,8 @@ impl CPU {
 		    self.nop_dop(),
 		// *NOP(NOP)
 		0x1A | 0x3A | 0x5A | 0x7A | 0xDA | 0xFA => self.nop(),
+		// *LAX
+		0xA7 | 0xB7 | 0xAF | 0xBF | 0xA3 | 0xB3 => self.lax(&opcode.mode),
 		// *NOP(TOP)
 		0x0C | 0x1C | 0x3C | 0x5C | 0x7C | 0xDC | 0xFC => {
 		    self.nop_top();

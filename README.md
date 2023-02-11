@@ -105,12 +105,12 @@ Cartridges ✅
 |ATX (LXA) [OAL] - (lxa)  |          |
 |AXA (SHA) [AXA] - (ahx)  |          |
 |AXS (SBX) [SAX] -        |          |
-|DCP (DCP) [DCM] -        | ✅       |
-|DOP (NOP) [SKB] - (nop)  |          |
+|DCP (DCP) [DCM] -        |          |
+|DOP (NOP) [SKB] - (nop)  | ✅       |
 |ISC (ISB) [INS] - (isb)  |          |
 |Kil (JAM) [HLT] - (nop?) |          |
 |LAR (LAE) [LAS] - (las)  |          |
-|LAX (LAX) [LAX] -        |          |
+|LAX (LAX) [LAX] -        | ✅       |
 |NOP (NOP) [NOP] -        | ✅       |
 |RLA (RLA) [RLA] -        |          |
 |RRA (RRA) [RRA] -        |          |

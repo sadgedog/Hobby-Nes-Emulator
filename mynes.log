@@ -5258,3 +5258,46 @@ E540  24 01     BIT $01 = FF                    A:FF X:03 Y:77 P:A5 SP:FB
 E542  38        SEC                             A:FF X:03 Y:77 P:E5 SP:FB
 E543  A9 00     LDA #$00                        A:FF X:03 Y:77 P:E5 SP:FB
 E545  A3 40    *LAX ($40,X) @ 43 = 0580 = 55    A:00 X:03 Y:77 P:67 SP:FB
+E547  EA        NOP                             A:55 X:55 Y:77 P:65 SP:FB
+E548  EA        NOP                             A:55 X:55 Y:77 P:65 SP:FB
+E549  EA        NOP                             A:55 X:55 Y:77 P:65 SP:FB
+E54A  EA        NOP                             A:55 X:55 Y:77 P:65 SP:FB
+E54B  F0 12     BEQ $E55F                       A:55 X:55 Y:77 P:65 SP:FB
+E54D  30 10     BMI $E55F                       A:55 X:55 Y:77 P:65 SP:FB
+E54F  50 0E     BVC $E55F                       A:55 X:55 Y:77 P:65 SP:FB
+E551  90 0C     BCC $E55F                       A:55 X:55 Y:77 P:65 SP:FB
+E553  C9 55     CMP #$55                        A:55 X:55 Y:77 P:65 SP:FB
+E555  D0 08     BNE $E55F                       A:55 X:55 Y:77 P:67 SP:FB
+E557  E0 55     CPX #$55                        A:55 X:55 Y:77 P:67 SP:FB
+E559  D0 04     BNE $E55F                       A:55 X:55 Y:77 P:67 SP:FB
+E55B  C0 77     CPY #$77                        A:55 X:55 Y:77 P:67 SP:FB
+E55D  F0 04     BEQ $E563                       A:55 X:55 Y:77 P:67 SP:FB
+E563  A2 05     LDX #$05                        A:55 X:55 Y:77 P:67 SP:FB
+E565  A0 33     LDY #$33                        A:55 X:05 Y:77 P:65 SP:FB
+E567  B8        CLV                             A:55 X:05 Y:33 P:65 SP:FB
+E568  18        CLC                             A:55 X:05 Y:33 P:25 SP:FB
+E569  A9 00     LDA #$00                        A:55 X:05 Y:33 P:24 SP:FB
+E56B  A3 40    *LAX ($40,X) @ 45 = 0432 = AA    A:00 X:05 Y:33 P:26 SP:FB
+E56D  EA        NOP                             A:AA X:AA Y:33 P:A4 SP:FB
+E56E  EA        NOP                             A:AA X:AA Y:33 P:A4 SP:FB
+E56F  EA        NOP                             A:AA X:AA Y:33 P:A4 SP:FB
+E570  EA        NOP                             A:AA X:AA Y:33 P:A4 SP:FB
+E571  F0 12     BEQ $E585                       A:AA X:AA Y:33 P:A4 SP:FB
+E573  10 10     BPL $E585                       A:AA X:AA Y:33 P:A4 SP:FB
+E575  70 0E     BVS $E585                       A:AA X:AA Y:33 P:A4 SP:FB
+E577  B0 0C     BCS $E585                       A:AA X:AA Y:33 P:A4 SP:FB
+E579  C9 AA     CMP #$AA                        A:AA X:AA Y:33 P:A4 SP:FB
+E57B  D0 08     BNE $E585                       A:AA X:AA Y:33 P:27 SP:FB
+E57D  E0 AA     CPX #$AA                        A:AA X:AA Y:33 P:27 SP:FB
+E57F  D0 04     BNE $E585                       A:AA X:AA Y:33 P:27 SP:FB
+E581  C0 33     CPY #$33                        A:AA X:AA Y:33 P:27 SP:FB
+E583  F0 04     BEQ $E589                       A:AA X:AA Y:33 P:27 SP:FB
+E589  A9 87     LDA #$87                        A:AA X:AA Y:33 P:27 SP:FB
+E58B  85 67     STA $67 = 00                    A:87 X:AA Y:33 P:A5 SP:FB
+E58D  A9 32     LDA #$32                        A:87 X:AA Y:33 P:A5 SP:FB
+E58F  85 68     STA $68 = 00                    A:32 X:AA Y:33 P:25 SP:FB
+E591  A0 57     LDY #$57                        A:32 X:AA Y:33 P:25 SP:FB
+E593  24 01     BIT $01 = FF                    A:32 X:AA Y:57 P:25 SP:FB
+E595  38        SEC                             A:32 X:AA Y:57 P:E5 SP:FB
+E596  A9 00     LDA #$00                        A:32 X:AA Y:57 P:E5 SP:FB
+E598  A7 67    *LAX $67 = 87                    A:00 X:AA Y:57 P:67 SP:FB
