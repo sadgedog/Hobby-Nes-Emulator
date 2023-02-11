@@ -212,8 +212,8 @@ impl CPU {
 	} else {
 	    self.status = self.status & !ZERO_FLAG;
 	}
-
-	if result & 0b1000_0000 == 1 {
+	
+	if result & 0b1000_0000 != 0 {
 	    self.status = self.status | NEGATIVE_FLAG;
 	} else {
 	    self.status = self.status & !NEGATIVE_FLAG;
@@ -484,6 +484,7 @@ impl CPU {
 	let value = self.mem_read(addr);
 	self.register_a = value;
 	self.update_zero_and_negative_flags(self.register_a);
+	// self.set_register_a(value);
     }
 
     fn ldx(&mut self, mode: &AddressingMode) {
