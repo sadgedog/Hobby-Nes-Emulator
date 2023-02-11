@@ -1,6 +1,8 @@
 ## ABOUT THIS
 Hobby NES Emulator
 
+todo : fix processor status
+
 - How to run
 
 not work

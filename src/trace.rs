@@ -102,9 +102,14 @@ pub fn trace(cpu: &CPU) -> String {
                         format!("${:04x}", address)
                     }
                 }
-                AddressingMode::Absolute => format!(
-		    "${:04x} = {:02x}", mem_addr, stored_value
-		),
+                AddressingMode::Absolute => {
+		    // JMP(Absolute) JSR(Absolute)
+		    if ops.code == 0x4C || ops.code == 0x20 {
+			format!("${:04x}", mem_addr)
+		    } else {
+			format!("${:04x} = {:02x}", mem_addr, stored_value)
+		    }
+		}
                 AddressingMode::Absolute_X => format!(
                     "${:04x},X @ {:04x} = {:02x}",
                     address, mem_addr, stored_value
