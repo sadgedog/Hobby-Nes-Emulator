@@ -229,6 +229,13 @@ lazy_static! {
 	OpCode::new(0x9A, "TXS", 1, 2, AddressingMode::NoneAddressing),
 
 	OpCode::new(0x98, "TYA", 1, 2, AddressingMode::NoneAddressing),
+
+
+	// extra illegal instructions
+	
+
+
+	
     ];
     
     pub static ref OPCODES_MAP: HashMap<u8, &'static OpCode> = {
