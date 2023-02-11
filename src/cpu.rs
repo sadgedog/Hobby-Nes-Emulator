@@ -224,8 +224,8 @@ impl CPU {
 	if result >> 7 == 1 {
 	    self.status |= NEGATIVE_FLAG;
 	} else {
-
-	}self.status &= !NEGATIVE_FLAG;
+	    self.status &= !NEGATIVE_FLAG;
+	}
     }
 
     fn stack_pop(&mut self) -> u8 {
@@ -269,7 +269,7 @@ impl CPU {
 	if data >> 7 == 1 {
 	    self.status |= CARRY_FLAG; // set carry flag
 	} else {
-	    self.status |= !CARRY_FLAG; // remove carry flag
+	    self.status &= !CARRY_FLAG; // remove carry flag
 	}
 	data = data << 1;
 	self.register_a = data;
@@ -283,7 +283,7 @@ impl CPU {
 	if data >> 7 == 1 {
 	    self.status |= CARRY_FLAG; // set carry flag
 	} else {
-	    self.status |= !CARRY_FLAG; // remove carry flag
+	    self.status &= !CARRY_FLAG; // remove carry flag
 	}
 	data = data << 1;
 	self.mem_write(addr, data);
@@ -491,8 +491,8 @@ impl CPU {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
 	self.register_a = value;
-	self.update_zero_and_negative_flags(self.register_a);
-	// self.set_register_a(value);
+	// self.update_zero_and_negative_flags(self.register_a);
+	self.set_register_a(value);
     }
 
     fn ldx(&mut self, mode: &AddressingMode) {
@@ -609,7 +609,7 @@ impl CPU {
 	}
 	// right shift
 	value = value >> 1;
-	if tmp != 0 {
+	if tmp == CARRY_FLAG {
 	    value |= 0x80; // 0b1000_0000
 	}
 	self.set_register_a(value);
@@ -625,9 +625,11 @@ impl CPU {
 	} else {
 	    self.status &= !CARRY_FLAG;
 	}
-	value = value << 1;
-	if tmp != 0 {
-	    value |= 0x80; // 0b1000_0000
+	value = value >> 1;
+	if tmp == 1 {
+	    value |= NEGATIVE_FLAG; // 0b1000_0000
+	} else {
+	    value &= !NEGATIVE_FLAG;
 	}
 	self.mem_write(addr, value);
 	self.update_negative_flags(value);
