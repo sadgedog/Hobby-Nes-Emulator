@@ -112,11 +112,11 @@ Cartridges ✅
 |LAR (LAE) [LAS] - (las)  |          |
 |LAX (LAX) [LAX] -        | ✅       |
 |NOP (NOP) [NOP] -        | ✅       |
-|RLA (RLA) [RLA] -        |          |
-|RRA (RRA) [RRA] -        |          |
+|RLA (RLA) [RLA] -        | ✅       |
+|RRA (RRA) [RRA] -        | ✅       |
 |SBC (SBC) [SBC] -        | ✅       |
 |SLO (SLO) [ASO] -        | ✅       |
-|SRE (SRE) [LSE] -        |          |
+|SRE (SRE) [LSE] -        | ✅       |
 |SXA (SHX) [XAS] - (shx)  |          |
 |SYA (SHY) [SAY] - (shy)  |          |
 |TOP (NOP) [SKW] - (nop)  | ✅       |

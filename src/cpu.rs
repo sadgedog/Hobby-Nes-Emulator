@@ -748,13 +748,29 @@ impl CPU {
 	self.register_x = value;
     }
 
+    fn rla(&mut self, mode: &AddressingMode) {
+	let value = self.rol(mode);
+	self.set_register_a(value & self.register_a);
+    }
+
+    fn rra(&mut self, mode: &AddressingMode) {
+	let value = self.ror(mode);
+	self.add_to_register_a(value);
+    }
+
     fn sbc_ex(&mut self, mode: &AddressingMode) {
 	self.sbc(mode);
     }
 
-    fn slo(&mut self,mode: &AddressingMode) {
+    fn slo(&mut self, mode: &AddressingMode) {
 	let value = self.asl(mode);
 	self.register_a |= value;
+	self.update_zero_and_negative_flags(self.register_a);
+    }
+
+    fn sre(&mut self, mode : &AddressingMode) {
+	let value = self.lsr(mode);
+	self.register_a ^= value;
 	self.update_zero_and_negative_flags(self.register_a);
     }
     
@@ -993,23 +1009,46 @@ impl CPU {
 		0xC7 | 0xD7 | 0xCF | 0xDF | 0xDB | 0xD3 | 0xC3 => self.dcp(&opcode.mode),
 		// *NOP(DOP) (No Operation)
 		0x04 | 0x14 | 0x34 | 0x44 | 0x54 | 0x64 | 0x74 |
-		0x80 | 0x82 | 0x89 | 0xC2 | 0xD4 | 0xE2 | 0xF4 =>
+		0x80 | 0x82 | 0x89 | 0xC2 | 0xD4 | 0xE2 | 0xF4 => {
 		    // let addr = self.get_operand_address(&opcode.mode);
 		    // let value = self.mem_read(addr);
 		    // do nothing
-		    self.nop_dop(),
+		    self.nop_dop();
+		}
 		// *ISB(ISC)
-		0xE7 | 0xF7 | 0xEF | 0xFF | 0xFB | 0xE3 | 0xF3 => self.isb(&opcode.mode),
+		0xE7 | 0xF7 | 0xEF | 0xFF | 0xFB | 0xE3 | 0xF3 => {
+		    self.isb(&opcode.mode);
+		}
 		// *LAX
-		0xA7 | 0xB7 | 0xAF | 0xBF | 0xA3 | 0xB3 => self.lax(&opcode.mode),
+		0xA7 | 0xB7 | 0xAF | 0xBF | 0xA3 | 0xB3 => {
+		    self.lax(&opcode.mode);
+		}
 		// *NOP(NOP)
-		0x1A | 0x3A | 0x5A | 0x7A | 0xDA | 0xFA => self.nop(),
+		0x1A | 0x3A | 0x5A | 0x7A | 0xDA | 0xFA => {
+		    self.nop();
+		}
+		// *RLA
+		0x27 | 0x37 | 0x2F | 0x3F | 0x3B | 0x23 | 0x33 => {
+		    self.rla(&opcode.mode);
+		}
+		// *RRA
+		0x67 | 0x77 | 0x6F | 0x7F | 0x7B | 0x63 | 0x73 => {
+		    self.rra(&opcode.mode);
+		}
 		// *SBC
 		0xEB => self.sbc_ex(&opcode.mode),
 		// *SLO
-		0x07 | 0x17 | 0x0F | 0x1F | 0x1B | 0x03 | 0x13 => self.slo(&opcode.mode),
+		0x07 | 0x17 | 0x0F | 0x1F | 0x1B | 0x03 | 0x13 => {
+		    self.slo(&opcode.mode);
+		}
+		// *SRE
+		0x47 | 0x57 | 0x4F | 0x5F | 0x5B | 0x43 | 0x53 => {
+		    self.sre(&opcode.mode);
+		}
 		// *NOP(TOP)
-		0x0C | 0x1C | 0x3C | 0x5C | 0x7C | 0xDC | 0xFC => self.nop_top(),
+		0x0C | 0x1C | 0x3C | 0x5C | 0x7C | 0xDC | 0xFC => {
+		    self.nop_top();
+		}
 
 		
 		// other opecode (crash)
