@@ -99,13 +99,13 @@ Cartridges ✅
 |Instructinon             |Check List|
 |-------------------------|----------|
 |AAC (ANC) [ANC] - (anc)  |          |
-|AAX (SAX) [AXS] - (sax)  |          |
+|AAX (SAX) [AXS] - (sax)  | ✅       |
 |ARR (ARR) [ARR] -        |          |
 |ASR (ASR) [ALR] - (alr)  |          |
 |ATX (LXA) [OAL] - (lxa)  |          |
 |AXA (SHA) [AXA] - (ahx)  |          |
 |AXS (SBX) [SAX] -        |          |
-|DCP (DCP) [DCM] -        |          |
+|DCP (DCP) [DCM] -        | ✅       |
 |DOP (NOP) [SKB] - (nop)  | ✅       |
 |ISC (ISB) [INS] - (isb)  |          |
 |Kil (JAM) [HLT] - (nop?) |          |
@@ -114,7 +114,7 @@ Cartridges ✅
 |NOP (NOP) [NOP] -        | ✅       |
 |RLA (RLA) [RLA] -        |          |
 |RRA (RRA) [RRA] -        |          |
-|SBC (SBC) [SBC] -        |          |
+|SBC (SBC) [SBC] -        | ✅       |
 |SLO (SLO) [ASO] -        |          |
 |SRE (SRE) [LSE] -        |          |
 |SXA (SHX) [XAS] - (shx)  |          |

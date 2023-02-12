@@ -237,7 +237,7 @@ lazy_static! {
 	//     AAX (SAX) [AXS] - (sax)
 	OpCode::new(0x87, "*SAX", 2, 3, AddressingMode::ZeroPage),
 	OpCode::new(0x97, "*SAX", 2, 4, AddressingMode::ZeroPage_Y),
-	OpCode::new(0x83, "*SAX", 2, 6, AddressingMode::Indirect_Y),
+	OpCode::new(0x83, "*SAX", 2, 6, AddressingMode::Indirect_X),
 	OpCode::new(0x8F, "*SAX", 3, 4, AddressingMode::Absolute),
 	//     ARR (ARR) [ARR] -
 	OpCode::new(0x6B, "*ARR", 2, 2, AddressingMode::Immediate),
