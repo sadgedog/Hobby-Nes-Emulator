@@ -732,6 +732,15 @@ impl CPU {
 	return
     }
 
+    fn isb(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	let res = value.wrapping_add(1);
+	self.update_zero_and_negative_flags(res);
+	self.add_to_register_a(res.wrapping_neg().wrapping_sub(1));
+	self.mem_write(addr, res);
+    }
+
     fn lax(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -741,6 +750,12 @@ impl CPU {
 
     fn sbc_ex(&mut self, mode: &AddressingMode) {
 	self.sbc(mode);
+    }
+
+    fn slo(&mut self,mode: &AddressingMode) {
+	let value = self.asl(mode);
+	self.register_a |= value;
+	self.update_zero_and_negative_flags(self.register_a);
     }
     
     fn nop_top(&mut self) {
@@ -983,16 +998,18 @@ impl CPU {
 		    // let value = self.mem_read(addr);
 		    // do nothing
 		    self.nop_dop(),
-		// *NOP(NOP)
-		0x1A | 0x3A | 0x5A | 0x7A | 0xDA | 0xFA => self.nop(),
+		// *ISB(ISC)
+		0xE7 | 0xF7 | 0xEF | 0xFF | 0xFB | 0xE3 | 0xF3 => self.isb(&opcode.mode),
 		// *LAX
 		0xA7 | 0xB7 | 0xAF | 0xBF | 0xA3 | 0xB3 => self.lax(&opcode.mode),
+		// *NOP(NOP)
+		0x1A | 0x3A | 0x5A | 0x7A | 0xDA | 0xFA => self.nop(),
 		// *SBC
 		0xEB => self.sbc_ex(&opcode.mode),
+		// *SLO
+		0x07 | 0x17 | 0x0F | 0x1F | 0x1B | 0x03 | 0x13 => self.slo(&opcode.mode),
 		// *NOP(TOP)
-		0x0C | 0x1C | 0x3C | 0x5C | 0x7C | 0xDC | 0xFC => {
-		    self.nop_top();
-		}
+		0x0C | 0x1C | 0x3C | 0x5C | 0x7C | 0xDC | 0xFC => self.nop_top(),
 
 		
 		// other opecode (crash)

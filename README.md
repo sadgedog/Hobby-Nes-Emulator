@@ -107,7 +107,7 @@ Cartridges ✅
 |AXS (SBX) [SAX] -        |          |
 |DCP (DCP) [DCM] -        | ✅       |
 |DOP (NOP) [SKB] - (nop)  | ✅       |
-|ISC (ISB) [INS] - (isb)  |          |
+|ISC (ISB) [INS] - (isb)  | ✅       |
 |Kil (JAM) [HLT] - (nop?) |          |
 |LAR (LAE) [LAS] - (las)  |          |
 |LAX (LAX) [LAX] -        | ✅       |
@@ -115,7 +115,7 @@ Cartridges ✅
 |RLA (RLA) [RLA] -        |          |
 |RRA (RRA) [RRA] -        |          |
 |SBC (SBC) [SBC] -        | ✅       |
-|SLO (SLO) [ASO] -        |          |
+|SLO (SLO) [ASO] -        | ✅       |
 |SRE (SRE) [LSE] -        |          |
 |SXA (SHX) [XAS] - (shx)  |          |
 |SYA (SHY) [SAY] - (shy)  |          |
