@@ -1,8 +1,6 @@
 ## ABOUT THIS
 Hobby NES Emulator
 
-todo : fix processor status
-
 - How to run
 
 not work
@@ -98,7 +96,7 @@ Cartridges ✅
 
 |Instructinon             |Check List|
 |-------------------------|----------|
-|AAC (ANC) [ANC] - (anc)  |          |
+|AAC (ANC) [ANC] - (anc)  | ✅       |
 |AAX (SAX) [AXS] - (sax)  | ✅       |
 |ARR (ARR) [ARR] -        |          |
 |ASR (ASR) [ALR] - (alr)  |          |
@@ -108,7 +106,7 @@ Cartridges ✅
 |DCP (DCP) [DCM] -        | ✅       |
 |DOP (NOP) [SKB] - (nop)  | ✅       |
 |ISC (ISB) [INS] - (isb)  | ✅       |
-|Kil (JAM) [HLT] - (nop?) |          |
+|KIL (JAM) [HLT] - (nop?) |          |
 |LAR (LAE) [LAS] - (las)  |          |
 |LAX (LAX) [LAX] -        | ✅       |
 |NOP (NOP) [NOP] -        | ✅       |
@@ -122,7 +120,6 @@ Cartridges ✅
 |TOP (NOP) [SKW] - (nop)  | ✅       |
 |XAA (ANE) [XAA] -        |          |
 |XAS (SHS) [TAS] - (tas)  |          |
-
 
 
 

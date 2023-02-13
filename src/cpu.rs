@@ -711,10 +711,24 @@ impl CPU {
 	self.update_zero_and_negative_flags(self.register_a);
     }
 
+    // unofficial
     fn sax(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let res = self.register_x & self.register_a;
 	self.mem_write(addr, res);
+    }
+
+    // not confirmed
+    fn anc(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	self.register_a &= value;
+	self.update_zero_and_negative_flags(self.register_a);
+	if self.register_a & NEGATIVE_FLAG == NEGATIVE_FLAG {
+	    self.status |= CARRY_FLAG;
+	} else {
+	    self.status &= !CARRY_FLAG;
+	}
     }
 
     fn dcp(&mut self, mode: &AddressingMode) {
@@ -1001,10 +1015,19 @@ impl CPU {
 
 		
 		// illegal opcodes
+		// *ANC(AAC)
+		0x0B | 0x2B => {
+		    self.anc(&opcode.mode);
+		}
 		// *SAX(AAX)
 		0x87 | 0x97 | 0x8F | 0x83 => {
 		    self.sax(&opcode.mode);
 		}
+		// *AAR
+		// *ASR
+		// *LAX(ATX)
+		// *AHX(AXA)
+		// *AXS
 		// *DCP
 		0xC7 | 0xD7 | 0xCF | 0xDF | 0xDB | 0xD3 | 0xC3 => self.dcp(&opcode.mode),
 		// *NOP(DOP) (No Operation)
@@ -1019,6 +1042,8 @@ impl CPU {
 		0xE7 | 0xF7 | 0xEF | 0xFF | 0xFB | 0xE3 | 0xF3 => {
 		    self.isb(&opcode.mode);
 		}
+		// *NOP(KIL)
+		// *LAS(LAR)
 		// *LAX
 		0xA7 | 0xB7 | 0xAF | 0xBF | 0xA3 | 0xB3 => {
 		    self.lax(&opcode.mode);
@@ -1045,10 +1070,14 @@ impl CPU {
 		0x47 | 0x57 | 0x4F | 0x5F | 0x5B | 0x43 | 0x53 => {
 		    self.sre(&opcode.mode);
 		}
+		// *SHX(SXA)
+		// *SHY(SYA)
 		// *NOP(TOP)
 		0x0C | 0x1C | 0x3C | 0x5C | 0x7C | 0xDC | 0xFC => {
 		    self.nop_top();
 		}
+		// *XXA
+		// *XAS
 
 		
 		// other opecode (crash)
