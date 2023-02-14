@@ -712,23 +712,52 @@ impl CPU {
     }
 
     // unofficial
+    // not confirmed
+    fn anc(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	// self.register_a &= value;
+	// self.update_zero_and_negative_flags(self.register_a);
+	self.set_register_a(self.register_a & value);
+	if self.register_a & NEGATIVE_FLAG == NEGATIVE_FLAG {
+	    self.status |= CARRY_FLAG;
+	} else {
+	    self.status &= !CARRY_FLAG;
+	}
+    }
+
     fn sax(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let res = self.register_x & self.register_a;
 	self.mem_write(addr, res);
     }
 
-    // not confirmed
-    fn anc(&mut self, mode: &AddressingMode) {
+    fn arr(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
-	self.register_a &= value;
-	self.update_zero_and_negative_flags(self.register_a);
-	if self.register_a & NEGATIVE_FLAG == NEGATIVE_FLAG {
+	
+	// self.register_a &= value;
+	// self.update_zero_and_negative_flags(self.register_a);
+	self.set_register_a(self.register_a & value);
+	
+	self.ror_accumulator();
+	let res_bit_5 = (self.register_a >> 5) & 1;
+	let res_bit_6 = (self.register_a >> 6) & 1;
+
+	if (res_bit_5 == 1) & (res_bit_6 == 1) {
 	    self.status |= CARRY_FLAG;
-	} else {
+	    self.status &= !OVERFLOW_FLAG;
+	} else if (res_bit_5 == 0) & (res_bit_6 == 0) {
 	    self.status &= !CARRY_FLAG;
+	    self.status &= !OVERFLOW_FLAG;
+	} else if (res_bit_5 == 1) & (res_bit_6 == 0) {
+	    self.status &= !CARRY_FLAG;
+	    self.status |= OVERFLOW_FLAG;
+	} else if (res_bit_5 == 0) & (res_bit_6 == 1) {
+	    self.status |= CARRY_FLAG;
+	    self.status &= !OVERFLOW_FLAG;
 	}
+	self.update_zero_and_negative_flags(self.register_a);
     }
 
     fn dcp(&mut self, mode: &AddressingMode) {
@@ -1024,6 +1053,7 @@ impl CPU {
 		    self.sax(&opcode.mode);
 		}
 		// *AAR
+		0x6B => self.arr(&opcode.mode),
 		// *ASR
 		// *LAX(ATX)
 		// *AHX(AXA)
