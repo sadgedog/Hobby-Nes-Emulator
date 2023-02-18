@@ -760,6 +760,21 @@ impl CPU {
 	self.update_zero_and_negative_flags(self.register_a);
     }
 
+    fn alr(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	self.set_register_a(self.register_a & value);
+	self.lsr_accumulator();
+    }
+
+    fn lxa(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	self.set_register_a(self.register_a & value);
+	self.register_x = self.register_a;
+	self.update_zero_and_negative_flags(self.register_a);
+    }
+
     fn dcp(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -1052,10 +1067,12 @@ impl CPU {
 		0x87 | 0x97 | 0x8F | 0x83 => {
 		    self.sax(&opcode.mode);
 		}
-		// *AAR
+		// *ARR
 		0x6B => self.arr(&opcode.mode),
-		// *ASR
-		// *LAX(ATX)
+		// *ALR
+		0x4B => self.alr(&opcode.mode),
+		// *LXA(ATX)
+		0xAB => self.lxa(&opcode.mode),
 		// *AHX(AXA)
 		// *AXS
 		// *DCP

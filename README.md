@@ -99,8 +99,8 @@ Cartridges ✅
 |AAC (ANC) [ANC] - (anc)  | ✅       |
 |AAX (SAX) [AXS] - (sax)  | ✅       |
 |ARR (ARR) [ARR] -        | ✅       |
-|ASR (ASR) [ALR] - (alr)  |          |
-|ATX (LXA) [OAL] - (lxa)  |          |
+|ASR (ASR) [ALR] - (alr)  | ✅       |
+|ATX (LXA) [OAL] - (lxa)  | ✅       |
 |AXA (SHA) [AXA] - (ahx)  |          |
 |AXS (SBX) [SAX] -        |          |
 |DCP (DCP) [DCM] -        | ✅       |
