@@ -118,9 +118,8 @@ Cartridges ✅
 |SXA (SHX) [XAS] - (shx)  | ✅       |
 |SYA (SHY) [SAY] - (shy)  | ✅       |
 |TOP (NOP) [SKW] - (nop)  | ✅       |
-|XAA (ANE) [XAA] -        |          |
+|XAA (ANE) [XAA] -        | ✅       |
 |XAS (SHS) [TAS] - (tas)  | ✅       |
-
 
 
 PPU

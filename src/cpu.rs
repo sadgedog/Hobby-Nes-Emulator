@@ -895,7 +895,12 @@ impl CPU {
 
     // not confirmed
     fn xaa(&mut self, mode: &AddressingMode) {
-	// ???
+	// Exact operation unknown. <- ???
+	self.register_a = self.register_x;
+	self.update_zero_and_negative_flags(self.register_a);
+	let addr = self.get_operand_address(mode);
+	let data = self.mem_read(addr);
+	self.set_register_a(data & self.register_a);
     }
     
     // not confirmed
