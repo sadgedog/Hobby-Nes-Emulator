@@ -119,7 +119,7 @@ Cartridges ✅
 |SYA (SHY) [SAY] - (shy)  | ✅       |
 |TOP (NOP) [SKW] - (nop)  | ✅       |
 |XAA (ANE) [XAA] -        |          |
-|XAS (SHS) [TAS] - (tas)  |          |
+|XAS (SHS) [TAS] - (tas)  | ✅       |
 
 
 

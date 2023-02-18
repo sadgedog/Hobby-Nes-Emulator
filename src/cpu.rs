@@ -893,6 +893,19 @@ impl CPU {
 	return
     }
 
+    // not confirmed
+    fn xaa(&mut self, mode: &AddressingMode) {
+	// ???
+    }
+    
+    // not confirmed
+    fn tas(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let res = self.register_x & self.register_a;
+	self.stack_pointer = res;
+	let res1 = self.stack_pointer & (addr >> 8 as u8).wrapping_add(1) as u8;
+	self.mem_write(addr, res1);
+    }
 
     pub fn load_and_run(&mut self, program: Vec<u8>) {
 	self.load(program);
@@ -1188,10 +1201,10 @@ impl CPU {
 		0x0C | 0x1C | 0x3C | 0x5C | 0x7C | 0xDC | 0xFC => {
 		    self.nop_top();
 		}
-		// *XXA
-		// *XAS
-
-		
+		// *XAA
+		0x8B => self.xaa(&opcode.mode),
+		// *TAS(XAS)
+		0x9B => self.tas(&opcode.mode),
 		// other opecode (crash)
 		_ => self.crash(),
 	    }
