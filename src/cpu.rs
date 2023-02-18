@@ -725,13 +725,15 @@ impl CPU {
 	    self.status &= !CARRY_FLAG;
 	}
     }
-
+    
+    // not confirmed
     fn sax(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let res = self.register_x & self.register_a;
 	self.mem_write(addr, res);
     }
-
+    
+    // not confirmed
     fn arr(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -759,7 +761,8 @@ impl CPU {
 	}
 	self.update_zero_and_negative_flags(self.register_a);
     }
-
+    
+    // not confirmed
     fn alr(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -767,12 +770,34 @@ impl CPU {
 	self.lsr_accumulator();
     }
 
+    // not confirmed
     fn lxa(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
 	self.set_register_a(self.register_a & value);
 	self.register_x = self.register_a;
 	self.update_zero_and_negative_flags(self.register_a);
+    }
+    
+    // not confirmed
+    fn ahx(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	let res = self.register_x & self.register_a & (addr >> 8) as u8;
+	self.mem_write(addr, res);
+    }
+    
+    // not confirmed
+    fn axs(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	let tmp = self.register_x & self.register_a;
+	let res = tmp.wrapping_sub(tmp);
+	if value <= tmp {
+	    self.status |= CARRY_FLAG;
+	}
+	self.update_zero_and_negative_flags(res);
+	self.register_x = res;
     }
 
     fn dcp(&mut self, mode: &AddressingMode) {
@@ -798,7 +823,23 @@ impl CPU {
 	self.add_to_register_a(res.wrapping_neg().wrapping_sub(1));
 	self.mem_write(addr, res);
     }
-
+    
+    // not confirmed
+    fn kil(&mut self) {
+	return
+    }
+    
+    // not confirmed
+    fn las(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let value = self.mem_read(addr);
+	let res = value & self.stack_pointer;
+	self.register_a = res;
+	self.register_x = res;
+	self.stack_pointer = res;
+	self.update_zero_and_negative_flags(res);
+    }
+    
     fn lax(&mut self, mode: &AddressingMode) {
 	let addr = self.get_operand_address(&mode);
 	let value = self.mem_read(addr);
@@ -1074,7 +1115,9 @@ impl CPU {
 		// *LXA(ATX)
 		0xAB => self.lxa(&opcode.mode),
 		// *AHX(AXA)
+		0x9F | 0x93 => self.ahx(&opcode.mode),
 		// *AXS
+		0xCB => self.axs(&opcode.mode),
 		// *DCP
 		0xC7 | 0xD7 | 0xCF | 0xDF | 0xDB | 0xD3 | 0xC3 => self.dcp(&opcode.mode),
 		// *NOP(DOP) (No Operation)
@@ -1090,7 +1133,11 @@ impl CPU {
 		    self.isb(&opcode.mode);
 		}
 		// *NOP(KIL)
+		0x02 | 0x12 | 0x22 | 0x32 | 0x42 | 0x52 | 0x62 | 0x72 | 0x92 | 0xB2 | 0xD2 | 0xF2 => {
+		    self.kil();
+		}
 		// *LAS(LAR)
+		0xBB => self.las(&opcode.mode),
 		// *LAX
 		0xA7 | 0xB7 | 0xAF | 0xBF | 0xA3 | 0xB3 => {
 		    self.lax(&opcode.mode);

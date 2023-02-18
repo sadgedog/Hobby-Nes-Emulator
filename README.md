@@ -101,13 +101,13 @@ Cartridges ✅
 |ARR (ARR) [ARR] -        | ✅       |
 |ASR (ASR) [ALR] - (alr)  | ✅       |
 |ATX (LXA) [OAL] - (lxa)  | ✅       |
-|AXA (SHA) [AXA] - (ahx)  |          |
-|AXS (SBX) [SAX] -        |          |
+|AXA (SHA) [AXA] - (ahx)  | ✅       |
+|AXS (SBX) [SAX] -        | ✅       |
 |DCP (DCP) [DCM] -        | ✅       |
 |DOP (NOP) [SKB] - (nop)  | ✅       |
 |ISC (ISB) [INS] - (isb)  | ✅       |
-|KIL (JAM) [HLT] - (nop?) |          |
-|LAR (LAE) [LAS] - (las)  |          |
+|KIL (JAM) [HLT] - (nop?) | ✅       |
+|LAR (LAE) [LAS] - (las)  | ✅       |
 |LAX (LAX) [LAX] -        | ✅       |
 |NOP (NOP) [NOP] -        | ✅       |
 |RLA (RLA) [RLA] -        | ✅       |
