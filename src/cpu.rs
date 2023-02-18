@@ -867,10 +867,26 @@ impl CPU {
 	self.update_zero_and_negative_flags(self.register_a);
     }
 
-    fn sre(&mut self, mode : &AddressingMode) {
+    fn sre(&mut self, mode: &AddressingMode) {
 	let value = self.lsr(mode);
 	self.register_a ^= value;
 	self.update_zero_and_negative_flags(self.register_a);
+    }
+
+    // not confirmed
+    fn shx(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let tmp = (addr >> 8 as u8).wrapping_add(1) as u8;
+	let res = self.register_x & tmp;
+	self.mem_write(addr, res);
+    }
+
+    // not confirmed
+    fn shy(&mut self, mode: &AddressingMode) {
+	let addr = self.get_operand_address(&mode);
+	let tmp = (addr >> 8 as u8).wrapping_add(1) as u8;
+	let res = self.register_y & tmp;
+	self.mem_write(addr, res);
     }
     
     fn nop_top(&mut self) {
@@ -1165,7 +1181,9 @@ impl CPU {
 		    self.sre(&opcode.mode);
 		}
 		// *SHX(SXA)
+		0x9E => self.shx(&opcode.mode),
 		// *SHY(SYA)
+		0x9C => self.shy(&opcode.mode),
 		// *NOP(TOP)
 		0x0C | 0x1C | 0x3C | 0x5C | 0x7C | 0xDC | 0xFC => {
 		    self.nop_top();

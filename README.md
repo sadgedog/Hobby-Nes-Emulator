@@ -115,8 +115,8 @@ Cartridges ✅
 |SBC (SBC) [SBC] -        | ✅       |
 |SLO (SLO) [ASO] -        | ✅       |
 |SRE (SRE) [LSE] -        | ✅       |
-|SXA (SHX) [XAS] - (shx)  |          |
-|SYA (SHY) [SAY] - (shy)  |          |
+|SXA (SHX) [XAS] - (shx)  | ✅       |
+|SYA (SHY) [SAY] - (shy)  | ✅       |
 |TOP (NOP) [SKW] - (nop)  | ✅       |
 |XAA (ANE) [XAA] -        |          |
 |XAS (SHS) [TAS] - (tas)  |          |
