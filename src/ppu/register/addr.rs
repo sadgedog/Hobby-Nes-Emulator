@@ -1,3 +1,8 @@
+// Nesは分散システムなので、CPUは直接PPUのメモリ(CHR ROM)を読み込めない
+// なのでCPUはPPUの0x2006レジスタにCHR ROMの欲しい値のアドレスを書き込む
+// PPUはPPU 0x2006レジスタに書き込まれたことを確認すると,0x2006に書き込まれたCHR ROMアドレスを0x2007に書き込む
+// CPUはPPU 0x2007レジスタでPPUに要求したデータを取得する
+
 pub struct AddrRegister {
     value: (u8, u8),
     hi_ptr: bool,

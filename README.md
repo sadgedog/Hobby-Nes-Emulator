@@ -90,8 +90,6 @@ Cartridges ✅
 |TYA           | ✅       |
 
 
-- TODO
-
 6502 CPU Illegal Instruction
 
 |Instructinon             |Check List|
@@ -121,6 +119,8 @@ Cartridges ✅
 |XAA (ANE) [XAA] -        | ✅       |
 |XAS (SHS) [TAS] - (tas)  | ✅       |
 
+
+- TODO
 
 PPU
 
