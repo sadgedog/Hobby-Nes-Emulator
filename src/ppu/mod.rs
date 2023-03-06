@@ -1,4 +1,8 @@
 use crate::cartridge::Mirroring;
+use registers::addr::AddrRegister;
+use registers::control::ControlRegister;
+
+pub mod registers;
 
 pub struct NesPPU {
     // カートリッジに保存されている画像に関するデータ
@@ -10,8 +14,11 @@ pub struct NesPPU {
     // スプライト情報を保持する内部メモリ
     // スプライト：背景画像の上にコマ送りでキャラクターを描画する技術らしい
     pub oam_data: [u8: 256],
-    // ミラーリング
     pub mirroring: Mirroring,
+    // ./registers/addr.rs
+    pub addr: AddrRegister,
+    // ./registers/control.rs
+    pub ctrl: ControlRegister,
 }
 
 impl NesPPU {
@@ -22,6 +29,30 @@ impl NesPPU {
 	    vram: [0; 2048],
 	    oam_data: [0; 64 * 4],
 	    palette_table: [0; 32],
+	}
+    }
+
+    fn write_to_ppu_addr(&mut self, value: u8) {
+	self.addr.update(value);
+    }
+
+
+    fn increment_vram_addr(&mut self) {
+	self.addr.increment(self.ctrl.vram_addr_increment());
+    }
+
+    fn read_data(&mut self) -> u8 {
+	let addr = self.addr.get();
+	self.increment_vram_addr();
+
+	match addr {
+	    0..=0x1FFF => todo!("read from CHR ROM"),
+	    0x2000..=0x2FFF => todo!("read from RAM"),
+	    0x3000..=0x3EFF => panic!("addr space 0x3000..0x3EFF is not expected to be used, requested = {}", addr),
+	    0x3F00..=0x3FFF => {
+		self.palette_table[(addr - 0x3F00) as usize]
+	    }
+	    _ => panic!("unexpected access to mirrored space {}", addr),
 	}
     }
 }
