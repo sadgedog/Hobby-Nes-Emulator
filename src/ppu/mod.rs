@@ -19,6 +19,8 @@ pub struct NesPPU {
     pub addr: AddrRegister,
     // ./registers/control.rs
     pub ctrl: ControlRegister,
+    // 内部バッファ
+    internal_data_buf: u8,
 }
 
 impl NesPPU {
@@ -40,14 +42,44 @@ impl NesPPU {
     fn increment_vram_addr(&mut self) {
 	self.addr.increment(self.ctrl.vram_addr_increment());
     }
+    
+    // Horizontal:
+    //   [ A ] [ a ]
+    //   [ B ] [ b ]
+    
+    // Vertical:
+    //   [ A ] [ B ]
+    //   [ a ] [ b ]
+    pub fn mirror_vram_addr(&self, addr: u16) -> u16 {
+	let mirrored_vram = addr & 0b1011_1111_1111_11;
+	let vram_index = mirrored_vram - 0x2000;
+	let name_table = vram_index / 0x400;
+	match (&self.mirroring, name_table) {
+	    (Mirroring::VERTICAL, 2) | (Mirroring::VERTICAL, 3) => vram_index - 0x800,
+	    (Mirroring::HORIZONTAL, 2) => vram_index - 0x400,
+	    (Mirroring::HORIZONTAL, 1) => vram_index - 0x400,
+	    (Mirroring::HORIZONTAL, 3) => vram_index - 0x800,
+	    _ => vram_index,
+	}
+    }
 
     fn read_data(&mut self) -> u8 {
 	let addr = self.addr.get();
 	self.increment_vram_addr();
 
 	match addr {
-	    0..=0x1FFF => todo!("read from CHR ROM"),
-	    0x2000..=0x2FFF => todo!("read from RAM"),
+	    // read from CHR ROM
+	    0..=0x1FFF => {
+		let result = self.internal_data_buf;
+		self.internal_data_bud = self.chr_rom[addr as usize];
+		result
+	    }
+	    // read from RAM
+	    0x2000..=0x2FFF => {
+		let result = self.internal_data_buf;
+		self.internal_data_buf = self.vram[self.mirror_vram_addr(addr) as usize];
+		result
+	    }
 	    0x3000..=0x3EFF => panic!("addr space 0x3000..0x3EFF is not expected to be used, requested = {}", addr),
 	    0x3F00..=0x3FFF => {
 		self.palette_table[(addr - 0x3F00) as usize]
