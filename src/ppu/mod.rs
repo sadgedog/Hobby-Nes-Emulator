@@ -8,12 +8,12 @@ pub struct NesPPU {
     // カートリッジに保存されている画像に関するデータ
     pub chr_rom: Vec<u8>,
     // 画面で使用するパレットテーブルのデータを保持するための内部メモリ
-    pub palette_table: [u8: 32],
+    pub palette_table: [u8; 32],
     // 背景情報を保持する内部メモリ
-    pub vram: [u8: 2048],
+    pub vram: [u8; 2048],
     // スプライト情報を保持する内部メモリ
     // スプライト：背景画像の上にコマ送りでキャラクターを描画する技術らしい
-    pub oam_data: [u8: 256],
+    pub oam_data: [u8; 256],
     pub mirroring: Mirroring,
     // ./registers/addr.rs
     pub addr: AddrRegister,
@@ -21,6 +21,7 @@ pub struct NesPPU {
     pub ctrl: ControlRegister,
     // 内部バッファ
     internal_data_buf: u8,
+    
 }
 
 impl NesPPU {
@@ -31,6 +32,9 @@ impl NesPPU {
 	    vram: [0; 2048],
 	    oam_data: [0; 64 * 4],
 	    palette_table: [0; 32],
+	    internal_data_buf: 0,
+	    addr: AddrRegister::new(),
+	    ctrl: ControlRegister::new(),
 	}
     }
 
@@ -63,7 +67,8 @@ impl NesPPU {
 	}
     }
 
-    fn read_data(&mut self) -> u8 {
+    // TODO: pubは後で消すこと
+    pub fn read_data(&mut self) -> u8 {
 	let addr = self.addr.get();
 	self.increment_vram_addr();
 
@@ -71,7 +76,7 @@ impl NesPPU {
 	    // read from CHR ROM
 	    0..=0x1FFF => {
 		let result = self.internal_data_buf;
-		self.internal_data_bud = self.chr_rom[addr as usize];
+		self.internal_data_buf = self.chr_rom[addr as usize];
 		result
 	    }
 	    // read from RAM

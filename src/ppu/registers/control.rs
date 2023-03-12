@@ -13,7 +13,7 @@ bitflags! {
 
 impl ControlRegister {
     pub fn new() -> Self {
-	ControlRegister::from_bits_truncate(0b0000_0000);
+	ControlRegister::from_bits_truncate(0b0000_0000)
     }
 
     pub fn vram_addr_increment(&self) -> u8 {

@@ -3,13 +3,14 @@ pub mod opcodes;
 pub mod bus;
 pub mod cartridge;
 pub mod trace;
+pub mod ppu;
 
 use cpu::Mem;
 use cpu::CPU;
-use rand::Rng;
 use bus::Bus;
 use cartridge::Rom;
 use trace::trace;
+// use rand::Rng;
 
 use sdl2::event::Event;
 use sdl2::EventPump;
@@ -20,6 +21,9 @@ use sdl2::pixels::PixelFormatEnum;
 
 #[macro_use]
 extern crate lazy_static;
+
+#[macro_use]
+extern crate bitflags;
 
 fn color(byte: u8) -> Color {
     match byte {
