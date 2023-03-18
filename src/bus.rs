@@ -22,7 +22,6 @@ const PPU_REGISTERS_MIRRORS_END: u16 = 0x3FFF;
 
 pub struct Bus {
     cpu_vram: [u8; 2048],
-    // rom: Rom,
     prg_rom: Vec<u8>,
     ppu: NesPPU,
 }
@@ -33,7 +32,6 @@ impl Bus {
 	
 	Bus {
 	    cpu_vram: [0; 2048],
-	    // rom: rom,
 	    prg_rom: rom.prg_rom,
 	    ppu: ppu,
 	}
@@ -67,12 +65,8 @@ impl Mem for Bus {
 	    0x2008..= PPU_REGISTERS_MIRRORS_END => {
 		let mirror_down_addr = addr & 0b00100000_00000111;
 		self.mem_read(mirror_down_addr)
-	    }	    
-	    // PPU_REGISTERS ..= PPU_REGISTERS_MIRRORS_END => {
-	    // 	let _mirror_down_addr = addr & 0b0010_0000_0000_0111;
-	    // 	// todo!("PPU implement")
-	    // 	0
-	    // }
+	    }
+	    
 	    0x8000..=0xFFFF => self.read_prg_rom(addr),
 	    _ => {
 		println!("Ignoring mem access at {:x}", addr);
