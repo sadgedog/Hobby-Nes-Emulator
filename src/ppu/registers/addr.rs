@@ -11,7 +11,7 @@ pub struct AddrRegister {
 impl AddrRegister {
     pub fn new() -> Self {
 	AddrRegister {
-	    value: (0, 0), // big endian
+	    value: (0, 0), // big endian (cpuとは違うので注意)
 	    hi_ptr: true,
 	}
     }
@@ -27,7 +27,7 @@ impl AddrRegister {
 	} else {
 	    self.value.1 = data;
 	}
-
+	// mirror down
 	if self.get() > 0x3FFF {
 	    self.set(self.get() & 0b1111_1111_1111_11);
 	}

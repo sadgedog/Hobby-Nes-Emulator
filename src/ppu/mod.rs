@@ -38,13 +38,19 @@ impl NesPPU {
 	}
     }
 
+    // addr register
     fn write_to_ppu_addr(&mut self, value: u8) {
 	self.addr.update(value);
     }
 
-
+    // addr register
     fn increment_vram_addr(&mut self) {
 	self.addr.increment(self.ctrl.vram_addr_increment());
+    }
+
+    // control
+    fn write_to_ctrl(&mut self, value: u8) {
+	self.ctrl.update(value);
     }
     
     // Horizontal:
@@ -79,6 +85,7 @@ impl NesPPU {
 		self.internal_data_buf = self.chr_rom[addr as usize];
 		result
 	    }
+	    // PPU addr register
 	    // read from RAM
 	    0x2000..=0x2FFF => {
 		let result = self.internal_data_buf;
