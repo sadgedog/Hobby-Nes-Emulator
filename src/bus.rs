@@ -1,7 +1,7 @@
 use crate::cpu::Mem;
 use crate::cartridge::Rom;
 use crate::ppu::NesPPU;
-// use crate::ppu::PPU;
+use crate::ppu::PPU;
 
 //
 // -------  0x2000
@@ -47,7 +47,7 @@ impl Bus {
 }
 
 impl Mem for Bus {
-    fn mem_read(&self, addr: u16) -> u8 {
+    fn mem_read(&mut self, addr: u16) -> u8 {
 	match addr {
 	    RAM ..= RAM_MIRRORS_END => {
 		// CPUは0x0000~0x2000の13bitをRAM用に確保してる
@@ -60,7 +60,7 @@ impl Mem for Bus {
 	    }
 
 	    // TODO : ppuをtraitにしてpubにするのかな？
-	    // 0x2007 => self.ppu.read_data(),
+	    0x2007 => self.ppu.read_data(),
 
 	    0x2008..= PPU_REGISTERS_MIRRORS_END => {
 		let mirror_down_addr = addr & 0b00100000_00000111;

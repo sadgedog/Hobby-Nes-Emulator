@@ -135,3 +135,6 @@ export LIBRARY_PATH="$LIBRARY_PATH:/opt/homebrew/Cellar/sdl2/2.26.2/lib"
 export LIBRARY_PATH="$LIBRARY_PATH:/opt/homebrew/Cellar/sdl2_image/2.6.2_2/lib"
 
 changed load point 0x8000 => 0x0600 to make sure the CPU was complete and the game worked
+
+
+japanese reference: http://hp.vector.co.jp/authors/VA042397/nes/ppu.html

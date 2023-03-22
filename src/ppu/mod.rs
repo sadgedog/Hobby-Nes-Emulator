@@ -24,6 +24,12 @@ pub struct NesPPU {
     
 }
 
+pub trait PPU {
+    fn write_to_ppu_addr(&mut self, value: u8);
+    fn write_to_ctrl(&mut self, value: u8);
+    fn read_data(&mut self) -> u8;
+}
+
 impl NesPPU {
     pub fn new(chr_rom: Vec<u8>, mirroring: Mirroring) -> Self {
 	NesPPU {
@@ -39,18 +45,8 @@ impl NesPPU {
     }
 
     // addr register
-    fn write_to_ppu_addr(&mut self, value: u8) {
-	self.addr.update(value);
-    }
-
-    // addr register
     fn increment_vram_addr(&mut self) {
 	self.addr.increment(self.ctrl.vram_addr_increment());
-    }
-
-    // control
-    fn write_to_ctrl(&mut self, value: u8) {
-	self.ctrl.update(value);
     }
     
     // Horizontal:
@@ -72,9 +68,21 @@ impl NesPPU {
 	    _ => vram_index,
 	}
     }
+}
+
+impl PPU for NesPPU {
+    // addr register
+    fn write_to_ppu_addr(&mut self, value: u8) {
+	self.addr.update(value);
+    }
+
+    // control
+    fn write_to_ctrl(&mut self, value: u8) {
+	self.ctrl.update(value);
+    }
 
     // TODO: pubは後で消すこと
-    pub fn read_data(&mut self) -> u8 {
+    fn read_data(&mut self) -> u8 {
 	let addr = self.addr.get();
 	self.increment_vram_addr();
 
