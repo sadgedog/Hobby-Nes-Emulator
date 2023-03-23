@@ -31,6 +31,10 @@ pub trait PPU {
 }
 
 impl NesPPU {
+    pub fn new_empty_rom() -> Self {
+	NesPPU::new(vec![0; 2048], Mirroring::HORIZONTAL)
+    }
+    
     pub fn new(chr_rom: Vec<u8>, mirroring: Mirroring) -> Self {
 	NesPPU {
 	    chr_rom: chr_rom,
@@ -106,5 +110,67 @@ impl PPU for NesPPU {
 	    }
 	    _ => panic!("unexpected access to mirrored space {}", addr),
 	}
+    }
+}
+
+
+#[cfg(test)]
+pub mod test {
+    use super::*;
+
+    // #[test]
+    // fn test_ppu_vram_writes() {
+    //     let mut ppu = NesPPU::new_empty_rom();
+    //     ppu.write_to_ppu_addr(0x23);
+    //     ppu.write_to_ppu_addr(0x05);
+    //     ppu.write_to_data(0x66);
+
+    //     assert_eq!(ppu.vram[0x0305], 0x66);
+    // }
+    
+    #[test]
+    fn test_ppu_vram_reads() {
+        let mut ppu = NesPPU::new_empty_rom();
+        ppu.write_to_ctrl(0);
+        ppu.vram[0x0305] = 0x66;
+
+        ppu.write_to_ppu_addr(0x23);
+        ppu.write_to_ppu_addr(0x05);
+
+        ppu.read_data(); //load_into_buffer
+        assert_eq!(ppu.addr.get(), 0x2306);
+        assert_eq!(ppu.read_data(), 0x66);
+    }
+
+    #[test]
+    fn test_ppu_vram_reads_cross_page() {
+        let mut ppu = NesPPU::new_empty_rom();
+        ppu.write_to_ctrl(0);
+        ppu.vram[0x01ff] = 0x66;
+        ppu.vram[0x0200] = 0x77;
+
+        ppu.write_to_ppu_addr(0x21);
+        ppu.write_to_ppu_addr(0xff);
+
+        ppu.read_data(); //load_into_buffer
+        assert_eq!(ppu.read_data(), 0x66);
+        assert_eq!(ppu.read_data(), 0x77);
+    }
+
+    #[test]
+    fn test_ppu_vram_reads_step_32() {
+        let mut ppu = NesPPU::new_empty_rom();
+        ppu.write_to_ctrl(0b100);
+        ppu.vram[0x01ff] = 0x66;
+        ppu.vram[0x01ff + 32] = 0x77;
+        ppu.vram[0x01ff + 64] = 0x88;
+
+        ppu.write_to_ppu_addr(0x21);
+        ppu.write_to_ppu_addr(0xff);
+
+        ppu.read_data(); //load_into_buffer
+        assert_eq!(ppu.read_data(), 0x66);
+        assert_eq!(ppu.read_data(), 0x77);
+        assert_eq!(ppu.read_data(), 0x88);
     }
 }
