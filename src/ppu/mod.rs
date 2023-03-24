@@ -2,6 +2,7 @@ use crate::cartridge::Mirroring;
 use registers::addr::AddrRegister;
 use registers::control::ControlRegister;
 use registers::mask::MaskRegister;
+use registers::status::StatusRegister;
 
 pub mod registers;
 
@@ -25,8 +26,8 @@ pub struct NesPPU {
     pub ctrl: ControlRegister,
     // ./registers/mask.rs
     pub mask: MaskRegister,
-    
-    
+    // ./registers/sutatus.rs
+    pub status: StatusRegister,
 }
 
 pub trait PPU {
@@ -34,6 +35,7 @@ pub trait PPU {
     fn write_to_ctrl(&mut self, value: u8);
     fn read_data(&mut self) -> u8;
     fn write_to_mask(&mut self, value: u8);
+    fn read_status(&mut self) -> u8;
 }
 
 impl NesPPU {
@@ -52,6 +54,7 @@ impl NesPPU {
 	    addr: AddrRegister::new(),
 	    ctrl: ControlRegister::new(),
 	    mask: MaskRegister::new(),
+	    status: StatusRegister::new(),
 	}
     }
 
@@ -119,8 +122,21 @@ impl PPU for NesPPU {
 	}
     }
 
+    // mask
     fn write_to_mask(&mut self, value: u8) {
 	self.mask.update(value);
+    }
+
+    // status
+    // ステータスを読み込むと、VBlankとScroll、PPU_Addrのラッチがクリアされる
+    // TODO: VBlank, Addrのラッチ実装
+    fn read_status(&mut self) -> u8 {
+	let data = self.status.get_status();
+	self.status.reset_vblank_started();
+	// こんな感じ
+	// self.scroll.reset_latch();
+	// self.addr.reset_latch();
+	data
     }
 }
 
