@@ -1,26 +1,31 @@
 use crate::cartridge::Mirroring;
 use registers::addr::AddrRegister;
 use registers::control::ControlRegister;
+use registers::mask::MaskRegister;
 
 pub mod registers;
 
 pub struct NesPPU {
     // カートリッジに保存されている画像に関するデータ
     pub chr_rom: Vec<u8>,
-    // 画面で使用するパレットテーブルのデータを保持するための内部メモリ
-    pub palette_table: [u8; 32],
+    // PPUミラーリング
+    pub mirroring: Mirroring,
     // 背景情報を保持する内部メモリ
     pub vram: [u8; 2048],
     // スプライト情報を保持する内部メモリ
     // スプライト：背景画像の上にコマ送りでキャラクターを描画する技術らしい
     pub oam_data: [u8; 256],
-    pub mirroring: Mirroring,
+    // 画面で使用するパレットテーブルのデータを保持するための内部メモリ
+    pub palette_table: [u8; 32],
+    // 内部バッファ(addr)
+    internal_data_buf: u8,
     // ./registers/addr.rs
     pub addr: AddrRegister,
     // ./registers/control.rs
     pub ctrl: ControlRegister,
-    // 内部バッファ
-    internal_data_buf: u8,
+    // ./registers/mask.rs
+    pub mask: MaskRegister,
+    
     
 }
 
@@ -28,6 +33,7 @@ pub trait PPU {
     fn write_to_ppu_addr(&mut self, value: u8);
     fn write_to_ctrl(&mut self, value: u8);
     fn read_data(&mut self) -> u8;
+    fn write_to_mask(&mut self, value: u8);
 }
 
 impl NesPPU {
@@ -45,6 +51,7 @@ impl NesPPU {
 	    internal_data_buf: 0,
 	    addr: AddrRegister::new(),
 	    ctrl: ControlRegister::new(),
+	    mask: MaskRegister::new(),
 	}
     }
 
@@ -84,8 +91,8 @@ impl PPU for NesPPU {
     fn write_to_ctrl(&mut self, value: u8) {
 	self.ctrl.update(value);
     }
-
-    // TODO: pubは後で消すこと
+    
+    // addr register
     fn read_data(&mut self) -> u8 {
 	let addr = self.addr.get();
 	self.increment_vram_addr();
@@ -110,6 +117,10 @@ impl PPU for NesPPU {
 	    }
 	    _ => panic!("unexpected access to mirrored space {}", addr),
 	}
+    }
+
+    fn write_to_mask(&mut self, value: u8) {
+	self.mask.update(value);
     }
 }
 
