@@ -34,6 +34,9 @@ pub struct NesPPU {
     pub status: StatusRegister,
     // ./registers/scroll.rs
     pub scroll: ScrollRegister,
+    // NMI interrupt
+    scanline: u16,
+    cycles: usize,
 }
 
 pub trait PPU {
@@ -68,6 +71,8 @@ impl NesPPU {
 	    mask: MaskRegister::new(),
 	    status: StatusRegister::new(),
 	    scroll: ScrollRegister::new(),
+	    scanline: 0,
+	    cycles: 0,
 	}
     }
 
@@ -94,6 +99,29 @@ impl NesPPU {
 	    (Mirroring::HORIZONTAL, 3) => vram_index - 0x800,
 	    _ => vram_index,
 	}
+    }
+
+    // NMI Interrupt
+    pub fn tick(&mut self, cycles: u8) -> bool {
+	self.cycles += cycles as usize;
+	if self.cycles >= 341 {
+	    self.cycles = self.cycles - 341;
+	    self.scanline += 1;
+
+	    if self.scanline == 241 {
+		if self.ctrl.generate_nmi() {
+		    self.status.set_vblank_started(true);
+		    todo!("shold trigger nmi interrupt")
+		}
+	    }
+
+	    if self.scanline >= 262 {
+		self.scanline = 0;
+		self.status.reset_vblank_started();
+		return true;
+	    }
+	}
+	return false;
     }
 }
 

@@ -24,6 +24,8 @@ pub struct Bus {
     cpu_vram: [u8; 2048],
     prg_rom: Vec<u8>,
     ppu: NesPPU,
+
+    cycles: usize,
 }
 
 impl Bus {
@@ -34,7 +36,13 @@ impl Bus {
 	    cpu_vram: [0; 2048],
 	    prg_rom: rom.prg_rom,
 	    ppu: ppu,
+	    cycles: 0,
 	}
+    }
+
+    pub fn tick(&mut self, cycles: u8) {
+	self.cycles += cycles as usize;
+	self.ppu.tick(cycles * 3);
     }
 
     fn read_prg_rom(&self, mut addr: u16) -> u8 {
@@ -99,5 +107,19 @@ impl Mem for Bus {
 		println!("Ignoring mem write-access at {:x}", addr);
 	    }
 	}
+    }
+}
+
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::cartridge::test;
+
+    #[test]
+    fn test_mem_read_write_to_ram() {
+	let mut bus = Bus::new(test::test_rom());
+	bus.mem_write(0x01, 0x55);
+	assert_eq!(bus.mem_read(0x01), 0x55);
     }
 }

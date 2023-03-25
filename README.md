@@ -120,11 +120,28 @@ Cartridges ✅
 |XAS (SHS) [TAS] - (tas)  | ✅       |
 
 
+PPU : Registers
+
+|Registers          |Check List|
+|-------------------|----------|
+|Controller(0x2000) |✅        |
+|Mask(0x2001)       |✅        |
+|Status(0x2002)     |✅        |
+|OAM Address(0x2003)|✅        |
+|OAM Data(0x2004)   |✅        |
+|Scroll(0x2005)     |✅        |
+|Address(0x2006)    |✅        |
+|Data(0x20007)      |✅        |
+|OAM DMA(0x4014)    |✅        |
+
+
 - TODO
 
-PPU
+PPU(NMI interrupt, Rendering CHR ROM, Rendering Static Screen, Scrolling)
 
-APU
+Joypads
+
+APU(?)
 
 - MEMO
 
