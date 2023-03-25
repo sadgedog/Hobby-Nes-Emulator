@@ -11,12 +11,23 @@ impl OamRegisters {
 	}
     }
 
-    pub fn update_addr(&mut self, data: u8) {
+    pub fn write_addr(&mut self, data: u8) {
 	self.oam_addr = data;
     }
 
-    pub fn update_data(&mut self, data: u8) {
+    pub fn write_data(&mut self, data: u8) {
 	self.oam_data[self.oam_addr as usize] = data;
 	self.oam_addr = self.oam_addr.wrapping_add(1);
+    }
+
+    pub fn write_dma(&mut self, data: &[u8; 256]) {
+	for x in data.iter() {
+	    self.oam_data[self.oam_addr as usize] = *x;
+	    self.oam_addr = self.oam_addr.wrapping_add(1);
+	}
+    }
+
+    pub fn get_data(&mut self) -> u8 {
+	self.oam_data[self.oam_addr as usize]
     }
 }

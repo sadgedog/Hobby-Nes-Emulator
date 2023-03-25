@@ -4,6 +4,7 @@ use registers::control::ControlRegister;
 use registers::mask::MaskRegister;
 use registers::status::StatusRegister;
 use registers::scroll::ScrollRegister;
+use registers::oam::OamRegisters;
 
 pub mod registers;
 
@@ -16,8 +17,9 @@ pub struct NesPPU {
     pub vram: [u8; 2048],
     // スプライト情報を保持する内部メモリ
     // スプライト：背景画像の上にコマ送りでキャラクターを描画する技術らしい
-    pub oam_addr: u8,
-    pub oam_data: [u8; 64 * 4],
+    // pub oam_addr: u8,
+    // pub oam_data: [u8; 64 * 4],
+    pub oam: OamRegisters,
     // 画面で使用するパレットテーブルのデータを保持するための内部メモリ
     pub palette_table: [u8; 32],
     // 内部バッファ(addr)
@@ -44,7 +46,7 @@ pub trait PPU {
     fn write_to_data(&mut self, value: u8);
     fn write_to_oam_addr(&mut self, value: u8);
     fn write_to_oam_data(&mut self, value: u8);
-    fn read_oam_data(&self) -> u8;
+    fn read_oam_data(&mut self) -> u8;
     fn write_oam_dma(&mut self, value: &[u8; 256]);
 }
 
@@ -58,8 +60,7 @@ impl NesPPU {
 	    chr_rom: chr_rom,
 	    mirroring: mirroring,
 	    vram: [0; 2048],
-	    oam_addr: 0,
-	    oam_data: [0; 64 * 4],
+	    oam: OamRegisters::new(),
 	    palette_table: [0; 32],
 	    internal_data_buf: 0,
 	    addr: AddrRegister::new(),
@@ -157,24 +158,20 @@ impl PPU for NesPPU {
 
     // oam addr
     fn write_to_oam_addr(&mut self, value: u8) {
-	self.oam_addr = value;
+	self.oam.write_addr(value);
     }
 
     // oam data
     fn write_to_oam_data(&mut self, value: u8) {
-	self.oam_data[self.oam_addr as usize] = value;
-	self.oam_addr = self.oam_addr.wrapping_add(1);
+	self.oam.write_data(value);
     }
 
-    fn read_oam_data(&self) -> u8 {
-	self.oam_data[self.oam_addr as usize]
+    fn read_oam_data(&mut self) -> u8 {
+	self.oam.get_data()
     }
 
     fn write_oam_dma(&mut self, data: &[u8; 256]) {
-	for x in data.iter() {
-	    self.oam_data[self.oam_addr as usize] = *x;
-	    self.oam_addr = self.oam_addr.wrapping_add(1);
-	}
+	self.oam.write_dma(data);
     }
 
     
