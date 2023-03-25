@@ -16,7 +16,8 @@ pub struct NesPPU {
     pub vram: [u8; 2048],
     // スプライト情報を保持する内部メモリ
     // スプライト：背景画像の上にコマ送りでキャラクターを描画する技術らしい
-    pub oam_data: [u8; 256],
+    pub oam_addr: u8,
+    pub oam_data: [u8; 64 * 4],
     // 画面で使用するパレットテーブルのデータを保持するための内部メモリ
     pub palette_table: [u8; 32],
     // 内部バッファ(addr)
@@ -41,6 +42,10 @@ pub trait PPU {
     fn read_status(&mut self) -> u8;
     fn write_to_scroll(&mut self, value: u8);
     fn write_to_data(&mut self, value: u8);
+    fn write_to_oam_addr(&mut self, value: u8);
+    fn write_to_oam_data(&mut self, value: u8);
+    fn read_oam_data(&self) -> u8;
+    fn write_oam_dma(&mut self, value: &[u8; 256]);
 }
 
 impl NesPPU {
@@ -53,6 +58,7 @@ impl NesPPU {
 	    chr_rom: chr_rom,
 	    mirroring: mirroring,
 	    vram: [0; 2048],
+	    oam_addr: 0,
 	    oam_data: [0; 64 * 4],
 	    palette_table: [0; 32],
 	    internal_data_buf: 0,
@@ -149,10 +155,39 @@ impl PPU for NesPPU {
 	self.scroll.write(value);
     }
 
+    // oam addr
+    fn write_to_oam_addr(&mut self, value: u8) {
+	self.oam_addr = value;
+    }
+
+    // oam data
+    fn write_to_oam_data(&mut self, value: u8) {
+	self.oam_data[self.oam_addr as usize] = value;
+	self.oam_addr = self.oam_addr.wrapping_add(1);
+    }
+
+    fn read_oam_data(&self) -> u8 {
+	self.oam_data[self.oam_addr as usize]
+    }
+
+    fn write_oam_dma(&mut self, data: &[u8; 256]) {
+	for x in data.iter() {
+	    self.oam_data[self.oam_addr as usize] = *x;
+	    self.oam_addr = self.oam_addr.wrapping_add(1);
+	}
+    }
+
+    
+
+    
+
     fn write_to_data(&mut self, value: u8) {
 	let addr = self.addr.get();
 	match addr {
 	    0..=0x1FFF => println!("attempt to write to CHR ROM space {}", addr),
+	    0x2000..=0x2FFF => {
+		self.vram[self.mirror_vram_addr(addr) as usize] = value;
+	    }
 	    0x3000..=0x3EFF => unimplemented!("addr {} shouldnt be used in reality", addr),
 
 	    0x3F10 | 0x3F14 | 0x3F18 | 0x3F1C => {
@@ -173,15 +208,15 @@ impl PPU for NesPPU {
 pub mod test {
     use super::*;
 
-    // #[test]
-    // fn test_ppu_vram_writes() {
-    //     let mut ppu = NesPPU::new_empty_rom();
-    //     ppu.write_to_ppu_addr(0x23);
-    //     ppu.write_to_ppu_addr(0x05);
-    //     ppu.write_to_data(0x66);
+    #[test]
+    fn test_ppu_vram_writes() {
+        let mut ppu = NesPPU::new_empty_rom();
+        ppu.write_to_ppu_addr(0x23);
+        ppu.write_to_ppu_addr(0x05);
+        ppu.write_to_data(0x66);
 
-    //     assert_eq!(ppu.vram[0x0305], 0x66);
-    // }
+        assert_eq!(ppu.vram[0x0305], 0x66);
+    }
     
     #[test]
     fn test_ppu_vram_reads() {
@@ -198,8 +233,8 @@ pub mod test {
     }
 
     #[test]
-    fn test_ppu_vram_reads_cross_page() {
-        let mut ppu = NesPPU::new_empty_rom();
+    fn test_ppu_vram_reads_cross_page() { 
+	let mut ppu = NesPPU::new_empty_rom();
         ppu.write_to_ctrl(0);
         ppu.vram[0x01ff] = 0x66;
         ppu.vram[0x0200] = 0x77;
@@ -227,5 +262,138 @@ pub mod test {
         assert_eq!(ppu.read_data(), 0x66);
         assert_eq!(ppu.read_data(), 0x77);
         assert_eq!(ppu.read_data(), 0x88);
+    }
+
+    #[test]
+    fn test_vram_horizontal_mirror() {
+        let mut ppu = NesPPU::new_empty_rom();
+        ppu.write_to_ppu_addr(0x24);
+        ppu.write_to_ppu_addr(0x05);
+
+        ppu.write_to_data(0x66); //write to a
+
+        ppu.write_to_ppu_addr(0x28);
+        ppu.write_to_ppu_addr(0x05);
+
+        ppu.write_to_data(0x77); //write to B
+
+        ppu.write_to_ppu_addr(0x20);
+        ppu.write_to_ppu_addr(0x05);
+
+        ppu.read_data(); //load into buffer
+        assert_eq!(ppu.read_data(), 0x66); //read from A
+
+        ppu.write_to_ppu_addr(0x2C);
+        ppu.write_to_ppu_addr(0x05);
+
+        ppu.read_data(); //load into buffer
+        assert_eq!(ppu.read_data(), 0x77); //read from b
+    }
+
+    #[test]
+    fn test_vram_vertical_mirror() {
+        let mut ppu = NesPPU::new(vec![0; 2048], Mirroring::VERTICAL);
+
+        ppu.write_to_ppu_addr(0x20);
+        ppu.write_to_ppu_addr(0x05);
+
+        ppu.write_to_data(0x66); //write to A
+
+        ppu.write_to_ppu_addr(0x2C);
+        ppu.write_to_ppu_addr(0x05);
+
+        ppu.write_to_data(0x77); //write to b
+
+        ppu.write_to_ppu_addr(0x28);
+        ppu.write_to_ppu_addr(0x05);
+
+        ppu.read_data(); //load into buffer
+        assert_eq!(ppu.read_data(), 0x66); //read from a
+
+        ppu.write_to_ppu_addr(0x24);
+        ppu.write_to_ppu_addr(0x05);
+
+        ppu.read_data(); //load into buffer
+        assert_eq!(ppu.read_data(), 0x77); //read from B
+    }
+
+    #[test]
+    fn test_read_status_resets_latch() {
+        let mut ppu = NesPPU::new_empty_rom();
+        ppu.vram[0x0305] = 0x66;
+
+        ppu.write_to_ppu_addr(0x21);
+        ppu.write_to_ppu_addr(0x23);
+        ppu.write_to_ppu_addr(0x05);
+
+        ppu.read_data(); //load_into_buffer
+        assert_ne!(ppu.read_data(), 0x66);
+
+        ppu.read_status();
+
+        ppu.write_to_ppu_addr(0x23);
+        ppu.write_to_ppu_addr(0x05);
+
+        ppu.read_data(); //load_into_buffer
+        assert_eq!(ppu.read_data(), 0x66);
+    }
+
+    #[test]
+    fn test_ppu_vram_mirroring() {
+        let mut ppu = NesPPU::new_empty_rom();
+        ppu.write_to_ctrl(0);
+        ppu.vram[0x0305] = 0x66;
+
+        ppu.write_to_ppu_addr(0x63); //0x6305 -> 0x2305
+        ppu.write_to_ppu_addr(0x05);
+
+        ppu.read_data(); //load into_buffer
+        assert_eq!(ppu.read_data(), 0x66);
+    }
+
+    #[test]
+    fn test_read_status_resets_vblank() {
+        let mut ppu = NesPPU::new_empty_rom();
+        ppu.status.set_vblank_started(true);
+
+        let status = ppu.read_status();
+
+        assert_eq!(status >> 7, 1);
+        assert_eq!(ppu.status.get_status() >> 7, 0);
+    }
+
+    #[test]
+    fn test_oam_read_write() {
+        let mut ppu = NesPPU::new_empty_rom();
+        ppu.write_to_oam_addr(0x10);
+        ppu.write_to_oam_data(0x66);
+        ppu.write_to_oam_data(0x77);
+
+        ppu.write_to_oam_addr(0x10);
+        assert_eq!(ppu.read_oam_data(), 0x66);
+
+        ppu.write_to_oam_addr(0x11);
+        assert_eq!(ppu.read_oam_data(), 0x77);
+    }
+
+    #[test]
+    fn test_oam_dma() {
+        let mut ppu = NesPPU::new_empty_rom();
+
+        let mut data = [0x66; 256];
+        data[0] = 0x77;
+        data[255] = 0x88;
+
+        ppu.write_to_oam_addr(0x10);
+        ppu.write_oam_dma(&data);
+
+        ppu.write_to_oam_addr(0xf); //wrap around
+        assert_eq!(ppu.read_oam_data(), 0x88);
+
+        ppu.write_to_oam_addr(0x10);
+        assert_eq!(ppu.read_oam_data(), 0x77);
+  
+        ppu.write_to_oam_addr(0x11);
+        assert_eq!(ppu.read_oam_data(), 0x66);
     }
 }
