@@ -3,6 +3,7 @@ use registers::addr::AddrRegister;
 use registers::control::ControlRegister;
 use registers::mask::MaskRegister;
 use registers::status::StatusRegister;
+use registers::scroll::ScrollRegister;
 
 pub mod registers;
 
@@ -28,6 +29,8 @@ pub struct NesPPU {
     pub mask: MaskRegister,
     // ./registers/sutatus.rs
     pub status: StatusRegister,
+    // ./registers/scroll.rs
+    pub scroll: ScrollRegister,
 }
 
 pub trait PPU {
@@ -36,6 +39,8 @@ pub trait PPU {
     fn read_data(&mut self) -> u8;
     fn write_to_mask(&mut self, value: u8);
     fn read_status(&mut self) -> u8;
+    fn write_to_scroll(&mut self, value: u8);
+    fn write_to_data(&mut self, value: u8);
 }
 
 impl NesPPU {
@@ -55,6 +60,7 @@ impl NesPPU {
 	    ctrl: ControlRegister::new(),
 	    mask: MaskRegister::new(),
 	    status: StatusRegister::new(),
+	    scroll: ScrollRegister::new(),
 	}
     }
 
@@ -129,14 +135,36 @@ impl PPU for NesPPU {
 
     // status
     // ステータスを読み込むと、VBlankとScroll、PPU_Addrのラッチがクリアされる
-    // TODO: VBlank, Addrのラッチ実装
     fn read_status(&mut self) -> u8 {
 	let data = self.status.get_status();
+	// reset
 	self.status.reset_vblank_started();
-	// こんな感じ
-	// self.scroll.reset_latch();
-	// self.addr.reset_latch();
+	self.addr.reset_latch();
+	self.scroll.reset_latch();
 	data
+    }
+
+    // scroll
+    fn write_to_scroll(&mut self, value: u8) {
+	self.scroll.write(value);
+    }
+
+    fn write_to_data(&mut self, value: u8) {
+	let addr = self.addr.get();
+	match addr {
+	    0..=0x1FFF => println!("attempt to write to CHR ROM space {}", addr),
+	    0x3000..=0x3EFF => unimplemented!("addr {} shouldnt be used in reality", addr),
+
+	    0x3F10 | 0x3F14 | 0x3F18 | 0x3F1C => {
+		let addr_mirror = addr - 0x10;
+		self.palette_table[(addr_mirror - 0x3F00) as usize] = value;
+	    }
+	    0x3F00..=0x3FFF => {
+		self.palette_table[(addr - 0x3F00) as usize] = value;
+	    }
+	    _ => panic!("unexpected access to mirrored space {}", addr),
+	}
+	self.increment_vram_addr();
     }
 }
 
