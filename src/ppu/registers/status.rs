@@ -45,7 +45,7 @@ impl StatusRegister {
 	self.set(StatusRegister::SPRITE_ZERO_HIT, flag);
     }
 
-    pub fn set_vblan_started(&mut self, flag: bool) {
+    pub fn set_vblank_started(&mut self, flag: bool) {
 	self.set(StatusRegister::VBLANK_STARTED, flag);
     }
 
