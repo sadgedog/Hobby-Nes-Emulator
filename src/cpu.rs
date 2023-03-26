@@ -308,7 +308,6 @@ impl CPU {
     fn bcc(&mut self) {
 	// CARRY FLAGがセットされていない場合
 	// PC += PCアドレスの値+1
-	// if self.status & CARRY_FLAG != CARRY_FLAG {
 	if !self.status.contains(CpuFlags::CARRY_FLAG) {
 	    self.branch();
 	}
@@ -317,14 +316,12 @@ impl CPU {
     fn bcs(&mut self) {
 	// CARRY FLAGがセットされている場合
 	// PC += PCアドレスの値+1
-	// if self.status & CARRY_FLAG == CARRY_FLAG {
 	if self.status.contains(CpuFlags::CARRY_FLAG) {
 	    self.branch();
 	}
     }
 
     fn beq(&mut self) {
-	// if self.status & ZERO_FLAG == ZERO_FLAG {
 	if self.status.contains(CpuFlags::ZERO_FLAG) {
 	    self.branch();
 	}
@@ -359,14 +356,12 @@ impl CPU {
     }
 
     fn bne(&mut self) {
-	//if self.status & ZERO_FLAG == CLEAR_STATUS {
 	if !self.status.contains(CpuFlags::ZERO_FLAG) {
 	    self.branch();
 	}
     }
 
     fn bpl(&mut self) {
-	// if self.status & NEGATIVE_FLAG == CLEAR_STATUS {
 	if !self.status.contains(CpuFlags::NEGATIVE_FLAG) {
 	    self.branch();
 	}
@@ -376,7 +371,6 @@ impl CPU {
     }
 
     fn bvc(&mut self) {
-	// if self.status & OVERFLOW_FLAG == CLEAR_STATUS {
 	if !self.status.contains(CpuFlags::OVERFLOW_FLAG) {
 	    self.branch();
 	}
@@ -390,31 +384,18 @@ impl CPU {
     }
 
     fn clc(&mut self) {
-	// if self.status & CARRY_FLAG == CARRY_FLAG {
-	// if self.status.contains(CpuFlags::CARRY_FLAG) {
-	//     self.status -= 1;
-	// }
 	self.status.remove(CpuFlags::CARRY_FLAG);
     }
 
     fn cld(&mut self) {
-	// if self.status & DECIMAL_MODE_FLAG == DECIMAL_MODE_FLAG {
-	//     self.status -= DECIMAL_MODE_FLAG;
-	// }
 	self.status.remove(CpuFlags::DECIMAL_MODE_FLAG);
     }
 
     fn cli(&mut self) {
-	// if self.status & INTERRUPT_DISABLE == INTERRUPT_DISABLE {
-	//     self.status -= INTERRUPT_DISABLE;
-	// }
 	self.status.remove(CpuFlags::INTERRUPT_DISABLE);
     }
 
     fn clv(&mut self) {
-	// if self.status & OVERFLOW_FLAG == OVERFLOW_FLAG {
-	//     self.status -= OVERFLOW_FLAG;
-	// }
 	self.status.remove(CpuFlags::OVERFLOW_FLAG);
     }
 
@@ -585,10 +566,8 @@ impl CPU {
 	let tmp = self.status.contains(CpuFlags::CARRY_FLAG);
 	if value >> 7 == 1 {
 	    self.status.insert(CpuFlags::CARRY_FLAG);
-	    //self.status |= CARRY_FLAG;
 	} else {
 	    self.status.remove(CpuFlags::CARRY_FLAG);
-	    // self.status &= !CARRY_FLAG
 	}
 	// left shift
 	value = value << 1;
@@ -601,7 +580,6 @@ impl CPU {
     fn rol(&mut self, mode: &AddressingMode) -> u8 {
 	let addr = self.get_operand_address(mode);
 	let mut value = self.mem_read(addr);
-	// let tmp = self.status & CARRY_FLAG;
 	let tmp = self.status.contains(CpuFlags::CARRY_FLAG);
 	
 	if value >> 7 == 1 {
@@ -673,17 +651,14 @@ impl CPU {
     }
 
     fn sec(&mut self) {
-	// self.status |= CARRY_FLAG;
 	self.status.insert(CpuFlags::CARRY_FLAG);
     }
 
     fn sed(&mut self) {
-	// self.status |= DECIMAL_MODE_FLAG;
 	self.status.insert(CpuFlags::DECIMAL_MODE_FLAG);
     }
 
     fn sei(&mut self) {
-	// self.status |= INTERRUPT_DISABLE;
 	self.status.insert(CpuFlags::INTERRUPT_DISABLE);
     }
 
@@ -739,7 +714,6 @@ impl CPU {
 	// self.register_a &= value;
 	// self.update_zero_and_negative_flags(self.register_a);
 	self.set_register_a(self.register_a & value);
-	// if self.register_a & NEGATIVE_FLAG == NEGATIVE_FLAG {
 	if self.status.contains(CpuFlags::NEGATIVE_FLAG) {
 	    self.status.insert(CpuFlags::CARRY_FLAG);
 	} else {
@@ -766,23 +740,15 @@ impl CPU {
 	let res_bit_6 = (self.register_a >> 6) & 1;
 
 	if (res_bit_5 == 1) & (res_bit_6 == 1) {
-	    // self.status |= CARRY_FLAG;
-	    // self.status &= !OVERFLOW_FLAG;
 	    self.status.insert(CpuFlags::CARRY_FLAG);
 	    self.status.remove(CpuFlags::OVERFLOW_FLAG);
 	} else if (res_bit_5 == 0) & (res_bit_6 == 0) {
-	    // self.status &= !CARRY_FLAG;
-	    // self.status &= !OVERFLOW_FLAG;
 	    self.status.remove(CpuFlags::CARRY_FLAG);
 	    self.status.remove(CpuFlags::OVERFLOW_FLAG);
 	} else if (res_bit_5 == 1) & (res_bit_6 == 0) {
-	    // self.status &= !CARRY_FLAG;
-	    // self.status |= OVERFLOW_FLAG;
 	    self.status.remove(CpuFlags::CARRY_FLAG);
 	    self.status.insert(CpuFlags::OVERFLOW_FLAG);
 	} else if (res_bit_5 == 0) & (res_bit_6 == 1) {
-	    // self.status |= CARRY_FLAG;
-	    // self.status &= !OVERFLOW_FLAG;
 	    self.status.insert(CpuFlags::CARRY_FLAG);
 	    self.status.remove(CpuFlags::OVERFLOW_FLAG);
 	}
