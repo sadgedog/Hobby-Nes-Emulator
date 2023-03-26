@@ -933,18 +933,18 @@ impl CPU {
 	panic!("unexpected opecode was executed {:?} ", self.mem_read(pc));
     }
 
-    // fn interrupt_nmi(&mut self) {
-    // 	self.stack_push_u16(self.program_counter);
-    // 	let mut flag = self.status.clone();
-    // 	flag.set(CpuFlags::BREAK_COMMAND, 0);
-    // 	flag.set(CpuFlags::BREAK2_COMMAND, 1);
+    fn interrupt_nmi(&mut self) {
+	self.stack_push_u16(self.program_counter);
+	let mut flag = self.status.clone();
+	flag.set(CpuFlags::BREAK_COMMAND, false);
+	flag.set(CpuFlags::BREAK2_COMMAND, true);
 	
-    // 	self.stack_push(flag.bits);
-    // 	self.status.insert(CpuFlags::INTERRUPT_DISABLE);
+	self.stack_push(flag.bits);
+	self.status.insert(CpuFlags::INTERRUPT_DISABLE);
 
-    // 	self.bus.tick(2);
-    // 	self.program_counter = self.mem_read_u16(0xFFFA);
-    // }
+	self.bus.tick(2);
+	self.program_counter = self.mem_read_u16(0xFFFA);
+    }
     
     pub fn run(&mut self) {
 	self.run_with_callback(|_| {});
@@ -956,9 +956,9 @@ impl CPU {
     {
 	let ref opcodes: HashMap<u8, &'static opcodes::OpCode> = *opcodes::OPCODES_MAP;
 	loop {
-	    // if let Some(_nmi) = self.bus.poll_nmi_status() {
-	    // 	self.interrupt_nmi();
-	    // }
+	    if let Some(_nmi) = self.bus.poll_nmi_status() {
+		self.interrupt_nmi();
+	    }
 	    
 	    callback(self);
 	    // 0x8000の値(命令)を読み込む

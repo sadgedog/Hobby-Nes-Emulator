@@ -37,6 +37,7 @@ pub struct NesPPU {
     // NMI interrupt
     scanline: u16,
     cycles: usize,
+    pub nmi_interrupt: Option<u8>,
 }
 
 pub trait PPU {
@@ -73,6 +74,7 @@ impl NesPPU {
 	    scroll: ScrollRegister::new(),
 	    scanline: 0,
 	    cycles: 0,
+	    nmi_interrupt: None,
 	}
     }
 
@@ -117,11 +119,16 @@ impl NesPPU {
 
 	    if self.scanline >= 262 {
 		self.scanline = 0;
+		self.nmi_interrupt = None;
 		self.status.reset_vblank_started();
 		return true;
 	    }
 	}
 	return false;
+    }
+
+    fn poll_nmi_interrupt(&mut self) -> Option<u8> {
+	self.nmi_interrupt.take()
     }
 }
 
