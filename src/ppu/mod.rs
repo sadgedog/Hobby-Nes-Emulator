@@ -118,6 +118,7 @@ impl NesPPU {
 	    }
 
 	    if self.scanline >= 262 {
+				     
 		self.scanline = 0;
 		self.nmi_interrupt = None;
 		self.status.reset_vblank_started();
