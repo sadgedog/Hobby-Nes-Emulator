@@ -118,7 +118,6 @@ impl NesPPU {
 	    }
 
 	    if self.scanline >= 262 {
-				     
 		self.scanline = 0;
 		self.nmi_interrupt = None;
 		self.status.reset_vblank_started();
@@ -141,7 +140,13 @@ impl PPU for NesPPU {
 
     // control
     fn write_to_ctrl(&mut self, value: u8) {
+	let before_nmi_status = self.ctrl.generate_nmi();
 	self.ctrl.update(value);
+	if !before_nmi_status &&
+	    self.ctrl.generate_nmi() &&
+	    self.status.check_vblank_started() == 1 {
+	    self.nmi_interrupt = Some(1);
+	}
     }
     
     // addr register
@@ -209,10 +214,6 @@ impl PPU for NesPPU {
     fn write_oam_dma(&mut self, data: &[u8; 256]) {
 	self.oam.write_dma(data);
     }
-
-    
-
-    
 
     fn write_to_data(&mut self, value: u8) {
 	let addr = self.addr.get();
