@@ -1,11 +1,11 @@
 ## ABOUT THIS
 Hobby NES Emulator
 
-- How to run
+- Progress
 
-not work
+cargo run
 
-![snake_game](./docs/snake_game.gif)
+![rendering_test](./docs/rendering_test.gif)
 
 
 - book
@@ -134,10 +134,14 @@ PPU : Registers
 |Data(0x20007)      |✅        |
 |OAM DMA(0x4014)    |✅        |
 
+NMI interrupt ✅
+
+Rendering CHR ROM ✅
+
 
 - TODO
 
-PPU(NMI interrupt, Rendering CHR ROM, Rendering Static Screen, Scrolling)
+PPU(Rendering Static Screen, Scrolling)
 
 Joypads
 
