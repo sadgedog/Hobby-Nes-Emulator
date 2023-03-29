@@ -111,9 +111,10 @@ impl NesPPU {
 	    self.scanline += 1;
 
 	    if self.scanline == 241 {
-		// self.status.set_sprite_zero_hit(false);
+		self.status.set_vblank_started(true);
+		self.status.set_sprite_zero_hit(false);
 		if self.ctrl.generate_nmi() {
-		    self.status.set_vblank_started(true);
+		    // self.status.set_vblank_started(true);
 		    self.nmi_interrupt = Some(1);
 		}
 	    }
@@ -121,8 +122,8 @@ impl NesPPU {
 	    if self.scanline >= 262 {
 		self.scanline = 0;
 		self.nmi_interrupt = None;
+		self.status.set_sprite_zero_hit(false);
 		self.status.reset_vblank_started();
-		// self.status.set_sprite_zero_hit(false);
 		return true;
 	    }
 	}
@@ -230,7 +231,7 @@ impl PPU for NesPPU {
 	    0x2000..=0x2FFF => {
 		self.vram[self.mirror_vram_addr(addr) as usize] = value;
 	    }
-	    0x3000..=0x3EFF => unimplemented!("addr {} shouldnt be used in reality", addr),
+	    0x3000..=0x3EFF => unimplemented!("addr {:x} shouldnt be used in reality", addr),
 
 	    0x3F10 | 0x3F14 | 0x3F18 | 0x3F1C => {
 		let addr_mirror = addr - 0x10;
@@ -239,7 +240,7 @@ impl PPU for NesPPU {
 	    0x3F00..=0x3FFF => {
 		self.palette_table[(addr - 0x3F00) as usize] = value;
 	    }
-	    _ => panic!("unexpected access to mirrored space {}", addr),
+	    _ => panic!("unexpected access to mirrored space {:x}", addr),
 	}
 	self.increment_vram_addr();
     }

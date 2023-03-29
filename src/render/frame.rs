@@ -1,5 +1,4 @@
 // ゲーム画面レンダリング用
-
 pub struct Frame {
     pub data: Vec<u8>,
 }
