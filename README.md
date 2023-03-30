@@ -5,7 +5,7 @@ Hobby NES Emulator
 
 cargo run
 
-![rendering_bg](./docs/rendering_test.gif)
+![rendering_bg](./docs/rendering_bg.gif)
 
 
 - book
