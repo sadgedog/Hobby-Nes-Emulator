@@ -1208,8 +1208,11 @@ impl<'a> CPU<'a> {
 		0x04 | 0x14 | 0x34 | 0x44 | 0x54 | 0x64 | 0x74 |
 		0x80 | 0x82 | 0x89 | 0xC2 | 0xD4 | 0xE2 | 0xF4 => {
 		    // TODO: CHECK
-		    // let addr = self.get_operand_address(&opcode.mode);
-		    // let value = self.mem_read(addr);
+		    let (addr, page_cross) = self.get_operand_address(&opcode.mode);
+		    let value = self.mem_read(addr);
+		    if page_cross {
+			self.bus.tick(1);
+		    }
 		    // do nothing
 		    self.nop_dop();
 		}

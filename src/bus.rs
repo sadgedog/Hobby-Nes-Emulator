@@ -76,7 +76,7 @@ impl Mem for Bus<'_> {
 	    RAM ..= RAM_MIRRORS_END => {
 		// CPUは0x0000~0x2000の13bitをRAM用に確保してる
 		// RAMは11pinでCPUは16pinなので, 11bitに調整しないといけない
-		let mirror_down_addr = addr & 0b00000_0111_1111_1111;
+		let mirror_down_addr = addr & 0b0000_0111_1111_1111;
 		self.cpu_vram[mirror_down_addr as usize]
 	    }
 	    0x2000 | 0x2001 | 0x2003 | 0x2005 | 0x2006 | 0x4014 => {
