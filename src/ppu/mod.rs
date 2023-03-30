@@ -130,7 +130,7 @@ impl NesPPU {
 	return false;
     }
 
-    fn poll_nmi_interrupt(&mut self) -> Option<u8> {
+    pub fn poll_nmi_interrupt(&mut self) -> Option<u8> {
 	self.nmi_interrupt.take()
     }
 }
@@ -147,7 +147,7 @@ impl PPU for NesPPU {
 	self.ctrl.update(value);
 	if !before_nmi_status &&
 	    self.ctrl.generate_nmi() &&
-	    self.status.check_vblank_started() == 1 {
+	    self.status.check_vblank_started() {
 	    self.nmi_interrupt = Some(1);
 	}
     }

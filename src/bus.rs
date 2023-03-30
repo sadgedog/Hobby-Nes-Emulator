@@ -48,17 +48,19 @@ impl<'a> Bus<'a> {
     pub fn tick(&mut self, cycles: u8) {
 	self.cycles += cycles as usize;
 
-	let nmi_before = self.ppu.nmi_interrupt.is_some();
-	self.ppu.tick(cycles * 3);
-	let nmi_after = self.ppu.nmi_interrupt.is_some();
-
-	if !nmi_before && nmi_after {
+	// let nmi_before = self.ppu.nmi_interrupt.is_some();
+	let new_frame = self.ppu.tick(cycles * 3);
+	// let nmi_after = self.ppu.nmi_interrupt.is_some();
+	// if !nmi_before && nmi_after {
+	//     (self.gameloop_callback)(&self.ppu);
+	// }
+	if new_frame {
 	    (self.gameloop_callback)(&self.ppu);
 	}
     }
 
     pub fn poll_nmi_status(&mut self) -> Option<u8> {
-	self.ppu.nmi_interrupt.take()
+	self.ppu.poll_nmi_interrupt()
     }
 
     fn read_prg_rom(&self, mut addr: u16) -> u8 {
@@ -87,15 +89,15 @@ impl Mem for Bus<'_> {
 	    0x2004 => self.ppu.read_oam_data(),
 	    0x2007 => self.ppu.read_data(),
 	    0x4000..=0x4015 => {
-		println!("Ignoring APU");
+		// println!("Ignoring APU");
 		0
 	    }
 	    0x4016 => {
-		println!("Ignoring joypad1");
+		// println!("Ignoring joypad1");
 		0
 	    }
 	    0x4017 => {
-		println!("Ignoring joypad2");
+		// println!("Ignoring joypad2");
 		0
 	    }
 	    // 0x2008~0x3FFF
@@ -126,13 +128,13 @@ impl Mem for Bus<'_> {
 	    0x2006 => self.ppu.write_to_ppu_addr(data),
 	    0x2007 => self.ppu.write_to_data(data),
 	    0x4000..=0x4013 | 0x4015 => {
-		println!("Ignoring APU");
+		// println!("Ignoring APU");
 	    }
 	    0x4016 => {
-		println!("Ignoring joypad1");
+		// println!("Ignoring joypad1");
 	    }
 	    0x4017 => {
-		println!("Ignoring joypad2");
+		// println!("Ignoring joypad2");
 	    }
 	    0x4014 => {
 		let mut buffer: [u8; 256] = [0; 256];

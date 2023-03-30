@@ -51,7 +51,7 @@ fn show_tile(chr_rom: &Vec<u8>, bank: usize, tile_n: usize) -> Frame {
 		0 => palette::SYSTEM_PALLETE[0x01],
 		1 => palette::SYSTEM_PALLETE[0x23],
 		2 => palette::SYSTEM_PALLETE[0x27],
-		3 => palette::SYSTEM_PALLETE[0x31],
+		3 => palette::SYSTEM_PALLETE[0x30],
 		_ => panic!("cant be"),
 	    };
 	    frame.set_pixel(x, y, rgb)

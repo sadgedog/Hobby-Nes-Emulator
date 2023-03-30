@@ -246,8 +246,8 @@ lazy_static! {
 	//     ATX (LXA) [OAL] - (lxa)
 	OpCode::new(0xAB, "*LXA", 2, 3, AddressingMode::Immediate),
 	//     AXA (SHA) [AXA] - (ahx)
-	OpCode::new(0x9F, "*AHX", 3, 5, AddressingMode::Absolute_Y), // 4 or 5
-	OpCode::new(0x93, "*AHX", 2, 6, AddressingMode::Indirect_Y), // 6 -> 8?
+	OpCode::new(0x9F, "*AHX", 3, 4, AddressingMode::Absolute_Y), // 4 or 5
+	OpCode::new(0x93, "*AHX", 2, 8, AddressingMode::Indirect_Y), // 6 -> 8?
 	//     AXS (SBX) [SAX] -
 	OpCode::new(0xCB, "*AXS", 2, 2, AddressingMode::Immediate),
 	//     DCP (DCP) [DCM] -

@@ -91,6 +91,28 @@ fn page_cross(base: u16, addr: u16) -> bool {
     base & 0xFF00 != addr & 0xFF00
 }
 
+mod interrupt {
+    #[derive(PartialEq, Eq)]
+    pub enum InterruptType {
+	NMI,
+    }
+
+    #[derive(PartialEq, Eq)]
+    pub(super) struct Interrupt {
+	pub(super) itype: InterruptType,
+	pub(super) vector_addr: u16,
+	pub(super) b_flag_mask: u8,
+	pub(super) cpu_cycles: u8,
+    }
+
+    pub(super) const NMI: Interrupt = Interrupt {
+	itype: InterruptType::NMI,
+	vector_addr: 0xFFFA,
+	b_flag_mask: 0b0010_0000,
+	cpu_cycles: 2,
+    };
+}
+
 impl<'a> CPU<'a> {
     pub fn new<'b>(bus: Bus<'b>) -> CPU<'b> {
 	CPU {
@@ -952,6 +974,7 @@ impl<'a> CPU<'a> {
     pub fn load_and_run(&mut self, program: Vec<u8>) {
 	self.load(program);
 	self.reset();
+	self.program_counter = 0x0600;
 	self.run();
     }
 
@@ -977,17 +1000,17 @@ impl<'a> CPU<'a> {
 	panic!("unexpected opecode was executed {:?} ", self.mem_read(pc));
     }
 
-    fn interrupt_nmi(&mut self) {
+    fn interrupt(&mut self, interrupt: interrupt::Interrupt) {
 	self.stack_push_u16(self.program_counter);
 	let mut flag = self.status.clone();
-	flag.set(CpuFlags::BREAK_COMMAND, false);
-	flag.set(CpuFlags::BREAK2_COMMAND, true);
+	flag.set(CpuFlags::BREAK_COMMAND, interrupt.b_flag_mask & 0b010000 == 1);
+	flag.set(CpuFlags::BREAK2_COMMAND, interrupt.b_flag_mask & 0b100000 == 1);
 	
 	self.stack_push(flag.bits);
 	self.status.insert(CpuFlags::INTERRUPT_DISABLE);
 
-	self.bus.tick(2);
-	self.program_counter = self.mem_read_u16(0xFFFA);
+	self.bus.tick(interrupt.cpu_cycles);
+	self.program_counter = self.mem_read_u16(interrupt.vector_addr);
     }
     
     pub fn run(&mut self) {
@@ -1001,7 +1024,7 @@ impl<'a> CPU<'a> {
 	let ref opcodes: HashMap<u8, &'static opcodes::OpCode> = *opcodes::OPCODES_MAP;
 	loop {
 	    if let Some(_nmi) = self.bus.poll_nmi_status() {
-		self.interrupt_nmi();
+		self.interrupt(interrupt::NMI);
 	    }
 	    
 	    callback(self);
@@ -1009,7 +1032,7 @@ impl<'a> CPU<'a> {
 	    let code = self.mem_read(self.program_counter);
 	    self.program_counter += 1;
 	    let program_counter_state = self.program_counter;
-	    // println!("{}", self.program_counter);
+	    // println!("{:x}", self.program_counter);
 	    let opcode = opcodes.get(&code).expect(&format!("OpCode {:x} is not recognized", code));
 	    // println!("{:x}", code);
 

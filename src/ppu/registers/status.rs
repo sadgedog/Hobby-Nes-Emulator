@@ -49,12 +49,8 @@ impl StatusRegister {
 	self.set(StatusRegister::VBLANK_STARTED, flag);
     }
 
-    pub fn check_vblank_started(&self) -> u8 {
-	if self.contains(StatusRegister::VBLANK_STARTED) {
-	    1
-	} else {
-	    0
-	}
+    pub fn check_vblank_started(&self) -> bool {
+	self.contains(StatusRegister::VBLANK_STARTED)
     }
 
     pub fn reset_vblank_started(&mut self) {
