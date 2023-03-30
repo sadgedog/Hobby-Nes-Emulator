@@ -5,7 +5,7 @@ Hobby NES Emulator
 
 cargo run
 
-![rendering_test](./docs/rendering_test.gif)
+![rendering_bg](./docs/rendering_test.gif)
 
 
 - book
@@ -157,5 +157,6 @@ export LIBRARY_PATH="$LIBRARY_PATH:/opt/homebrew/Cellar/sdl2_image/2.6.2_2/lib"
 
 changed load point 0x8000 => 0x0600 to make sure the CPU was complete and the game worked
 
-
 japanese reference: http://hp.vector.co.jp/authors/VA042397/nes/ppu.html
+
+PPU write dataで3000番地に書き込むゲームは現状読み込めない

@@ -249,7 +249,10 @@ fn main() {
 	.create_texture_target(PixelFormatEnum::RGB24, 256, 240).unwrap();
     
     // cartridge
-    let bytes: Vec<u8> = std::fs::read("Alter_Ego.nes").unwrap();
+    // let bytes: Vec<u8> = std::fs::read("Alter_Ego.nes").unwrap();
+    // let bytes: Vec<u8> = std::fs::read("mojon-twins--multicart.nes").unwrap();
+    let bytes: Vec<u8> = std::fs::read("cyo.nes").unwrap();
+    
     let rom = Rom::new(&bytes).unwrap();    
     // bus
     let mut frame = Frame::new();
@@ -273,9 +276,9 @@ fn main() {
     let mut cpu = CPU::new(bus);
 
     cpu.reset();
-    // cpu.run();
+    cpu.run();
     
-    cpu.run_with_callback(move |cpu| {
-	println!("{}", trace(cpu));
-    })
+    // cpu.run_with_callback(move |cpu| {
+    // 	println!("{}", trace(cpu));
+    // })
 }
