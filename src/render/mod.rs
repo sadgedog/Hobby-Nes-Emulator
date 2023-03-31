@@ -12,6 +12,7 @@ pub fn render(ppu: &NesPPU, frame: &mut Frame) {
 	let tile_x = i % 32;
 	let tile_y = i / 32;
 	let tile = &ppu.chr_rom[(bank + tile * 16) as usize..=(bank + tile * 16 + 15) as usize];
+	let palette = bg_palette(ppu, tile_x, tile_y);
 
 	for y in 0..=7 {
 	    let mut upper = tile[y];
@@ -22,14 +23,33 @@ pub fn render(ppu: &NesPPU, frame: &mut Frame) {
 		upper = upper >> 1;
 		lower = lower >> 1;
 		let rgb = match value {
-		    0 => palette::SYSTEM_PALLETE[0x01],
-		    1 => palette::SYSTEM_PALLETE[0x23],
-		    2 => palette::SYSTEM_PALLETE[0x27],
-		    3 => palette::SYSTEM_PALLETE[0x30],
+		    0 => palette::SYSTEM_PALETTE[ppu.palette_table[0] as usize],
+		    1 => palette::SYSTEM_PALETTE[palette[1] as usize],
+		    2 => palette::SYSTEM_PALETTE[palette[2] as usize],
+		    3 => palette::SYSTEM_PALETTE[palette[3] as usize],
 		    _ => panic!("cant be"),
 		};
 		frame.set_pixel(tile_x * 8 + x, tile_y * 8 + y, rgb)
 	    }
 	}
     }
+}
+
+fn bg_palette(ppu: &NesPPU, tile_column: usize, tile_row: usize) -> [u8;4] {
+    let attr_table_idx = tile_row / 4 * 8 + tile_column / 4;
+    let attr_byte = ppu.vram[0x3C0 + attr_table_idx];
+
+    let palette_idx = match (tile_column % 4 / 2, tile_row % 4 / 2) {
+	(0, 0) => attr_byte & 0b11,
+	(1, 0) => (attr_byte >> 2) & 0b11,
+	(0, 1) => (attr_byte >> 4) & 0b11,
+	(1, 1) => (attr_byte >> 6) & 0b11,
+	(_, _) => panic!("should not happen"),
+    };
+    
+    let palette_start: usize = 1 + (palette_idx as usize) * 4;
+    [ppu.palette_table[0],
+     ppu.palette_table[palette_start],
+     ppu.palette_table[palette_start + 1],
+     ppu.palette_table[palette_start + 2]]
 }
