@@ -10,10 +10,10 @@ pub fn render(ppu: &NesPPU, frame: &mut Frame) {
     // background rendering
     for i in 0..0x03C0 {
 	let tile = ppu.vram[i] as u16;
-	let tile_x = i % 32;
-	let tile_y = i / 32;
+	let tile_column = i % 32;
+	let tile_row = i / 32;
 	let tile = &ppu.chr_rom[(bank + tile * 16) as usize..=(bank + tile * 16 + 15) as usize];
-	let palette = bg_palette(ppu, tile_x, tile_y);
+	let palette = bg_palette(ppu, tile_column, tile_row);
 
 	for y in 0..=7 {
 	    let mut upper = tile[y];
@@ -30,7 +30,7 @@ pub fn render(ppu: &NesPPU, frame: &mut Frame) {
 		    3 => palette::SYSTEM_PALETTE[palette[3] as usize],
 		    _ => panic!("cant be"),
 		};
-		frame.set_pixel(tile_x * 8 + x, tile_y * 8 + y, rgb)
+		frame.set_pixel(tile_column * 8 + x, tile_row * 8 + y, rgb)
 	    }
 	}
     }

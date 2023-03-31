@@ -19,13 +19,13 @@ bitflags! {
     //            line); cleared after reading $2002 and at dot 1 of the
     //            pre-render line.
     pub struct StatusRegister: u8 {
-	const OPEN_BUS_1      = 0b0000_0001;
-	const OPEN_BUS_2      = 0b0000_0010;
-	const OPEN_BUS_3      = 0b0000_0100;
-	const OPEN_BUS_4      = 0b0000_1000;
-	const OPEN_BUS_5      = 0b0001_0000;
-	const SPRITE_OVERFLOW = 0b0010_0000;
-	const SPRITE_ZERO_HIT = 0b0100_0000;
+	const OPEN_BUS_1       = 0b0000_0001;
+	const OPEN_BUS_2       = 0b0000_0010;
+	const OPEN_BUS_3       = 0b0000_0100;
+	const OPEN_BUS_4       = 0b0000_1000;
+	const OPEN_BUS_5       = 0b0001_0000;
+	const SPRITE_OVERFLOW  = 0b0010_0000;
+	const SPRITE_ZERO_HIT  = 0b0100_0000;
 	const VBLANK_STARTED   = 0b1000_0000;
     }
 }

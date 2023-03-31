@@ -5,6 +5,7 @@ pub mod cartridge;
 pub mod trace;
 pub mod ppu;
 pub mod render;
+pub mod joypad;
 
 use cpu::Mem;
 use cpu::CPU;
@@ -22,6 +23,7 @@ use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::pixels::PixelFormatEnum;
 // use std::time::Duration;
+use std::collections::HashMap;
 
 
 
@@ -252,11 +254,22 @@ fn main() {
     // let bytes: Vec<u8> = std::fs::read("Alter_Ego.nes").unwrap();
     // let bytes: Vec<u8> = std::fs::read("mojon-twins--multicart.nes").unwrap();
     let bytes: Vec<u8> = std::fs::read("cyo.nes").unwrap();
-    
     let rom = Rom::new(&bytes).unwrap();    
     // bus
     let mut frame = Frame::new();
-    let bus = Bus::new(rom, move |ppu: &NesPPU| {
+
+    let mut key_map = HashMap::new();
+    key_map.insert(Keycode::Down, joypad::JoyPadButton::DOWN);
+    key_map.insert(Keycode::Up, joypad::JoyPadButton::UP);
+    key_map.insert(Keycode::Right, joypad::JoyPadButton::RIGHT);
+    key_map.insert(Keycode::Left, joypad::JoyPadButton::LEFT);
+    key_map.insert(Keycode::Space, joypad::JoyPadButton::SELECT);
+    key_map.insert(Keycode::Return, joypad::JoyPadButton::START);
+    key_map.insert(Keycode::A, joypad::JoyPadButton::BUTTON_A);
+    key_map.insert(Keycode::S, joypad::JoyPadButton::BUTTON_B);
+    
+   
+    let bus = Bus::new(rom, move |ppu: &NesPPU, joypad: &mut joypad::JoyPad| {
 	render::render(ppu, &mut frame);
 	texture.update(None, &frame.data, 256 * 3).unwrap();
 	canvas.copy(&texture, None, None).unwrap();
@@ -268,6 +281,18 @@ fn main() {
 	            keycode: Some(Keycode::Escape),
 	            ..
 	        } => std::process::exit(0),
+
+		Event::KeyDown { keycode, .. } => {
+		    if let Some(key) = key_map.get(&keycode.unwrap_or(Keycode::Ampersand)) {
+			joypad.set_button_pressed_status(*key, true);
+		    }
+		}
+		Event::KeyUp { keycode, .. } => {
+		    if let Some(key) = key_map.get(&keycode.unwrap_or(Keycode::Ampersand)) {
+			joypad.set_button_pressed_status(*key, false);
+		    }
+		}
+		
 	        _ => { /* do nothing */ }
 	    }
 	}

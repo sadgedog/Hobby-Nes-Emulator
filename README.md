@@ -5,7 +5,7 @@ Hobby NES Emulator
 
 cargo run
 
-![rendering_bg](./docs/rendering_bg.gif)
+![demo_1](./docs/demo_1.gif)
 
 
 - book
@@ -138,12 +138,13 @@ NMI interrupt ✅
 
 Rendering CHR ROM ✅
 
+Rendering Static Screen ✅
+
+Joypads ✅
 
 - TODO
 
-PPU(Rendering Static Screen, Scrolling)
-
-Joypads
+PPU(Scrolling)
 
 APU(?)
 

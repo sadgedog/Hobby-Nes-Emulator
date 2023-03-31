@@ -71,9 +71,9 @@ impl ControlRegister {
 
     pub fn sprite_size(&self) -> u8 {
 	if self.contains(ControlRegister::SPRITE_SIZE) {
-	    8
-	} else {
 	    16
+	} else {
+	    8
 	}
     }
 

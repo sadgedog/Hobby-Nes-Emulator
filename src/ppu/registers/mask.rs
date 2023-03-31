@@ -34,36 +34,20 @@ impl MaskRegister {
 	MaskRegister::from_bits_truncate(0b0000_0000)
     }
 
-    pub fn check_gray_scale(&self) -> u8 {
-	if self.contains(MaskRegister::GRAY_SCALE) {
-	    1
-	} else {
-	    0
-	}
+    pub fn check_gray_scale(&self) -> bool {
+	self.contains(MaskRegister::GRAY_SCALE)
     }
 
-    pub fn check_show_background_left(&self) -> u8 {
-	if self.contains(MaskRegister::SHOW_BACKGROUND_LEFT) {
-	    1
-	} else {
-	    0
-	}
+    pub fn check_show_background_left(&self) -> bool {
+	self.contains(MaskRegister::SHOW_BACKGROUND_LEFT)
     }
 
-    pub fn check_show_sprite_left(&self) -> u8 {
-	if self.contains(MaskRegister::SHOW_SPRITE_LEFT) {
-	    1
-	} else {
-	    0
-	}
+    pub fn check_show_sprite_left(&self) -> bool {
+	self.contains(MaskRegister::SHOW_SPRITE_LEFT)
     }
 
-    pub fn check_show_background(&self) -> u8 {
-	if self.contains(MaskRegister::SHOW_BACKGROUND) {
-	    1
-	} else {
-	    0
-	}
+    pub fn check_show_background(&self) -> bool {
+	self.contains(MaskRegister::SHOW_BACKGROUND)
     }
 
     pub fn emphasize_red(&self) -> Vec<Color> {

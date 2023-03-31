@@ -18,7 +18,7 @@ pub struct NesPPU {
     // スプライト情報を保持する内部メモリ
     // スプライト：背景画像の上にコマ送りでキャラクターを描画する技術らしい
     pub oam_addr: u8,
-    pub oam_data: [u8; 64 * 4],
+    pub oam_data: [u8; 256],
     pub oam: OamRegisters,
     // 画面で使用するパレットテーブルのデータを保持するための内部メモリ
     pub palette_table: [u8; 32],
@@ -211,11 +211,13 @@ impl PPU for NesPPU {
     // oam addr
     fn write_to_oam_addr(&mut self, value: u8) {
 	self.oam.write_addr(value);
+	self.oam_addr = self.oam.oam_addr;
     }
 
     // oam data
     fn write_to_oam_data(&mut self, value: u8) {
 	self.oam.write_data(value);
+	self.oam_data = self.oam.oam_data;
     }
 
     fn read_oam_data(&mut self) -> u8 {
@@ -224,6 +226,8 @@ impl PPU for NesPPU {
 
     fn write_oam_dma(&mut self, data: &[u8; 256]) {
 	self.oam.write_dma(data);
+	self.oam_addr = self.oam.oam_addr;
+	self.oam_data = self.oam.oam_data;
     }
 
     fn write_to_data(&mut self, value: u8) {

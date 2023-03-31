@@ -1,6 +1,6 @@
 pub struct OamRegisters {
-    oam_addr: u8,
-    oam_data: [u8; 256],
+    pub oam_addr: u8,
+    pub oam_data: [u8; 256],
 }
 
 impl OamRegisters {
