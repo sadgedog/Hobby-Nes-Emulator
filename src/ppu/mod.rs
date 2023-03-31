@@ -17,8 +17,8 @@ pub struct NesPPU {
     pub vram: [u8; 2048],
     // スプライト情報を保持する内部メモリ
     // スプライト：背景画像の上にコマ送りでキャラクターを描画する技術らしい
-    // pub oam_addr: u8,
-    // pub oam_data: [u8; 64 * 4],
+    pub oam_addr: u8,
+    pub oam_data: [u8; 64 * 4],
     pub oam: OamRegisters,
     // 画面で使用するパレットテーブルのデータを保持するための内部メモリ
     pub palette_table: [u8; 32],
@@ -65,6 +65,8 @@ impl NesPPU {
 	    mirroring: mirroring,
 	    vram: [0; 2048],
 	    oam: OamRegisters::new(),
+	    oam_addr: 0,
+	    oam_data: [0; 64 * 4],
 	    palette_table: [0; 32],
 	    internal_data_buf: 0,
 	    addr: AddrRegister::new(),
