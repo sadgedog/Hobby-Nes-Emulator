@@ -50,13 +50,8 @@ impl<'a> Bus<'a> {
 
     pub fn tick(&mut self, cycles: u8) {
 	self.cycles += cycles as usize;
-
-	// let nmi_before = self.ppu.nmi_interrupt.is_some();
 	let new_frame = self.ppu.tick(cycles * 3);
-	// let nmi_after = self.ppu.nmi_interrupt.is_some();
-	// if !nmi_before && nmi_after {
-	//     (self.gameloop_callback)(&self.ppu);
-	// }
+	
 	if new_frame {
 	    (self.gameloop_callback)(&self.ppu, &mut self.joypad1);
 	}
@@ -92,14 +87,14 @@ impl Mem for Bus<'_> {
 	    0x2004 => self.ppu.read_oam_data(),
 	    0x2007 => self.ppu.read_data(),
 	    0x4000..=0x4015 => {
-		// println!("Ignoring APU");
+		println!("Ignoring APU");
 		0
 	    }
 	    0x4016 => {
 		self.joypad1.read()
 	    }
 	    0x4017 => {
-		// println!("Ignoring joypad2");
+		println!("Ignoring joypad2");
 		0
 	    }
 	    // 0x2008~0x3FFF
@@ -130,13 +125,13 @@ impl Mem for Bus<'_> {
 	    0x2006 => self.ppu.write_to_ppu_addr(data),
 	    0x2007 => self.ppu.write_to_data(data),
 	    0x4000..=0x4013 | 0x4015 => {
-		// println!("Ignoring APU");
+		println!("Ignoring APU");
 	    }
 	    0x4016 => {
 		self.joypad1.write(data);
 	    }
 	    0x4017 => {
-		// println!("Ignoring joypad2");
+		println!("Ignoring joypad2");
 	    }
 	    0x4014 => {
 		let mut buffer: [u8; 256] = [0; 256];

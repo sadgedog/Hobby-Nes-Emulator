@@ -28,7 +28,6 @@ pub struct CPU<'a> {
     pub status: CpuFlags,
     pub program_counter: u16,
     pub stack_pointer: u8,
-    // memory: [u8; 0xFFFF]
     pub bus: Bus<'a>,
 }
 
@@ -1296,7 +1295,6 @@ impl<'a> CPU<'a> {
 	    if program_counter_state == self.program_counter {
 		self.program_counter += (opcode.len - 1) as u16;
 	    }
-	    // callback(self);
 	}
     }
 }

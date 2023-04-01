@@ -116,7 +116,6 @@ impl NesPPU {
 		self.status.set_vblank_started(true);
 		self.status.set_sprite_zero_hit(false);
 		if self.ctrl.generate_nmi() {
-		    // self.status.set_vblank_started(true);
 		    self.nmi_interrupt = Some(1);
 		}
 	    }

@@ -119,8 +119,7 @@ fn main() {
         .unwrap();
 
     //load the game
-    let bytes: Vec<u8> = std::fs::read("Alter_Ego.nes").unwrap();
-    // let bytes: Vec<u8> = std::fs::read("superpakpak.nes").unwrap();
+    let bytes: Vec<u8> = std::fs::read("cyo.nes").unwrap();
     let rom = Rom::new(&bytes).unwrap();
 
 
@@ -142,29 +141,4 @@ fn main() {
             }
          }
     }
-
-    // let mut frame = Frame::new();
-
-    // let bus = Bus::new(rom, move |ppu: &NesPPU| {
-    // 	render::render(ppu, &mut frame);
-    // 	texture.update(None, &frame.data, 256 * 3).unwrap();
-    // 	canvas.copy(&texture, None, None).unwrap();
-    // 	canvas.present();
-    // 	for event in event_pump.poll_iter() {
-    // 	    match event {
-    // 	        Event::Quit { .. }
-    // 	        | Event::KeyDown {
-    // 	            keycode: Some(Keycode::Escape),
-    // 	            ..
-    // 	        } => std::process::exit(0),
-    // 	        _ => { /* do nothing */ }
-    // 	    }
-    // 	}
-    // });
-
-    // let mut cpu = CPU::new(bus);
-
-    // cpu.reset();
-    // cpu.run();
-
 }

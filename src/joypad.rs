@@ -11,7 +11,6 @@ bitflags! {
     }
 }
 
-
 pub struct JoyPad {
     strobe: bool,
     button_index: u8,
