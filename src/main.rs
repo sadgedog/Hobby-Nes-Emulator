@@ -11,9 +11,7 @@ use cpu::Mem;
 use cpu::CPU;
 use bus::Bus;
 use cartridge::Rom;
-use trace::trace;
 use render::frame::Frame;
-use render::palette;
 use ppu::NesPPU;
 
 use sdl2::event::Event;
