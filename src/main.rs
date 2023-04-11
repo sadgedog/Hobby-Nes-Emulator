@@ -95,7 +95,8 @@ fn main() {
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
     let window = video_subsystem
-	.window("TILE TEST", (256.0 * 3.0) as u32, (240.0 * 3.0) as u32) // 1pixを10倍
+	.window("NES EMULATOR", (256.0 * 3.0) as u32, (240.0 * 3.0) as u32)
+	// .window("TILE TEST", (256.0 * 4.0) as u32, (240.0 * 2.0) as u32) // 1pixを10倍
 	.position_centered()
 	.build()
 	.unwrap();
@@ -103,15 +104,17 @@ fn main() {
     let mut canvas = window.into_canvas().present_vsync().build().unwrap();
     let mut event_pump = sdl_context.event_pump().unwrap();
     canvas.set_scale(3.0, 3.0).unwrap();
+    // canvas.set_scale(2.0, 2.0).unwrap();
 
     let creator = canvas.texture_creator();
     let mut texture = creator
 	.create_texture_target(PixelFormatEnum::RGB24, 256, 240).unwrap();
+    // .create_texture_target(PixelFormatEnum::RGB24, 256 * 2, 240).unwrap();
     
     // cartridge
     // let bytes: Vec<u8> = std::fs::read("Alter_Ego.nes").unwrap();
-    // let bytes: Vec<u8> = std::fs::read("mojon-twins--multicart.nes").unwrap();
-    let bytes: Vec<u8> = std::fs::read("cyo.nes").unwrap();
+    let bytes: Vec<u8> = std::fs::read("mojon-twins--multicart.nes").unwrap();
+    // let bytes: Vec<u8> = std::fs::read("cyo.nes").unwrap();
     let rom = Rom::new(&bytes).unwrap();    
     // bus
     let mut frame = Frame::new();
@@ -129,7 +132,8 @@ fn main() {
    
     let bus = Bus::new(rom, move |ppu: &NesPPU, joypad: &mut joypad::JoyPad| {
 	render::render(ppu, &mut frame);
-	texture.update(None, &frame.data, 256 * 3).unwrap();
+	// texture.update(None, &frame.data, 256 * 3).unwrap();
+	texture.update(None, &frame.data, 256 * 2 * 3).unwrap();
 	canvas.copy(&texture, None, None).unwrap();
 	canvas.present();
 	for event in event_pump.poll_iter() {
@@ -159,9 +163,9 @@ fn main() {
     let mut cpu = CPU::new(bus);
 
     cpu.reset();
-    cpu.run();
+    // cpu.run();
     
-    // cpu.run_with_callback(move |cpu| {
-    // 	println!("{}", trace(cpu));
-    // })
+    cpu.run_with_callback(move |cpu| {
+	// println!("{}", trace(cpu));
+    })
 }

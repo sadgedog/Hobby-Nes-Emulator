@@ -103,7 +103,7 @@ pub fn render(ppu: &NesPPU, frame: &mut Frame) {
 	(Mirroring::VERTICAL, 0x2400) | (Mirroring::VERTICAL, 0x2C00) => {
 	    (&ppu.vram[0x400..0x800], &ppu.vram[0..0x400])
 	}
-	(_,_) => panic!("not supported mirroring type {:?}", ppu.mirroring)
+	(_,_) => (&ppu.vram[0..0x400], &ppu.vram[0x400..0x800])
     };
 
     render_name_table(ppu, frame, main_nametable,

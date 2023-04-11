@@ -94,6 +94,7 @@ mod interrupt {
     #[derive(PartialEq, Eq)]
     pub enum InterruptType {
 	NMI,
+	BRK,
     }
 
     #[derive(PartialEq, Eq)]
@@ -109,6 +110,13 @@ mod interrupt {
 	vector_addr: 0xFFFA,
 	b_flag_mask: 0b0010_0000,
 	cpu_cycles: 2,
+    };
+
+    pub(super) const BRK: Interrupt = Interrupt {
+	itype: InterruptType::BRK,
+	vector_addr: 0xFFFE,
+	b_flag_mask: 0b0011_0000,
+	cpu_cycles: 1,
     };
 }
 
@@ -1067,9 +1075,15 @@ impl<'a> CPU<'a> {
 		// BPL (Branch if Positive)
 		0x10 => self.bpl(),
 		// BRK (Force Interrupt)
+		// 0x00 => {
+		//     self.brk();
+		//     return
+		// }
 		0x00 => {
-		    self.brk();
-		    return
+		    self.program_counter += 1;
+		    if !self.status.contains(CpuFlags::INTERRUPT_DISABLE) {
+			self.interrupt(interrupt::BRK);
+		    }
 		}
 		// BVC (Branch if Overflow Clear)
 		0x50 => self.bvc(),
@@ -1079,7 +1093,7 @@ impl<'a> CPU<'a> {
 		0x18 => self.clc(),
 		// CLD (Clear Decimal Mode)
 		0xd8 => self.cld(),
-		// CLI (Clear Interruput Disable)
+		// CLI (Clear Interrupt Disable)
 		0x58 => self.cli(),
 		// CLV (Clear Oveflow Flag)
 		0xb8 => self.clv(),
