@@ -78,17 +78,15 @@ pub fn trace(cpu: &mut CPU) -> String {
             let address = cpu.mem_read_u16(begin + 1);
 
             match ops.mode {
-                AddressingMode::NoneAddressing  => format!(
-		    "${:04x}", address
-		),
+                AddressingMode::NoneAddressing => format!("${:04x}", address),
                 AddressingMode::Absolute => {
-		    // JMP(Absolute) JSR(Absolute)
-		    if ops.code == 0x4C || ops.code == 0x20 {
-			format!("${:04x}", mem_addr)
-		    } else {
-			format!("${:04x} = {:02x}", mem_addr, stored_value)
-		    }
-		}
+                    // JMP(Absolute) JSR(Absolute)
+                    if ops.code == 0x4C || ops.code == 0x20 {
+                        format!("${:04x}", mem_addr)
+                    } else {
+                        format!("${:04x} = {:02x}", mem_addr, stored_value)
+                    }
+                }
                 AddressingMode::Absolute_X => format!(
                     "${:04x},X @ {:04x} = {:02x}",
                     address, mem_addr, stored_value
@@ -97,8 +95,8 @@ pub fn trace(cpu: &mut CPU) -> String {
                     "${:04x},Y @ {:04x} = {:02x}",
                     address, mem_addr, stored_value
                 ),
-		AddressingMode::Indirect_jmp => {
-		    if ops.code == 0x6C {
+                AddressingMode::Indirect_jmp => {
+                    if ops.code == 0x6C {
                         //jmp indirect
                         let jmp_addr = if address & 0x00FF == 0x00FF {
                             let lo = cpu.mem_read(address);
@@ -107,14 +105,14 @@ pub fn trace(cpu: &mut CPU) -> String {
                         } else {
                             cpu.mem_read_u16(address)
                         };
-			format!("(${:04x}) = {:04x}", address, jmp_addr)
-		    } else {
-			format!("${:04x}", address)
-		    }
-		}
-		_ => panic!(
-		    "unexpected addressing mode {:?} has ops-len 3. code {:02x}",
-		    ops.mode, ops.code
+                        format!("(${:04x}) = {:04x}", address, jmp_addr)
+                    } else {
+                        format!("${:04x}", address)
+                    }
+                }
+                _ => panic!(
+                    "unexpected addressing mode {:?} has ops-len 3. code {:02x}",
+                    ops.mode, ops.code
                 ),
             }
         }

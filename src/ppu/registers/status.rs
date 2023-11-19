@@ -19,45 +19,49 @@ bitflags! {
     //            line); cleared after reading $2002 and at dot 1 of the
     //            pre-render line.
     pub struct StatusRegister: u8 {
-	const OPEN_BUS_1       = 0b0000_0001;
-	const OPEN_BUS_2       = 0b0000_0010;
-	const OPEN_BUS_3       = 0b0000_0100;
-	const OPEN_BUS_4       = 0b0000_1000;
-	const OPEN_BUS_5       = 0b0001_0000;
-	const SPRITE_OVERFLOW  = 0b0010_0000;
-	const SPRITE_ZERO_HIT  = 0b0100_0000;
-	const VBLANK_STARTED   = 0b1000_0000;
+    const OPEN_BUS_1       = 0b0000_0001;
+    const OPEN_BUS_2       = 0b0000_0010;
+    const OPEN_BUS_3       = 0b0000_0100;
+    const OPEN_BUS_4       = 0b0000_1000;
+    const OPEN_BUS_5       = 0b0001_0000;
+    const SPRITE_OVERFLOW  = 0b0010_0000;
+    const SPRITE_ZERO_HIT  = 0b0100_0000;
+    const VBLANK_STARTED   = 0b1000_0000;
     }
 }
 
 impl StatusRegister {
     pub fn new() -> Self {
-	StatusRegister::from_bits_truncate(0b0000_0000)
+        StatusRegister::from_bits_truncate(0b0000_0000)
     }
 
     pub fn open_bus() {}
 
     pub fn set_sprite_overflow(&mut self, flag: bool) {
-	self.set(StatusRegister::SPRITE_OVERFLOW, flag);
+        self.set(StatusRegister::SPRITE_OVERFLOW, flag);
     }
 
     pub fn set_sprite_zero_hit(&mut self, flag: bool) {
-	self.set(StatusRegister::SPRITE_ZERO_HIT, flag);
+        self.set(StatusRegister::SPRITE_ZERO_HIT, flag);
     }
 
     pub fn set_vblank_started(&mut self, flag: bool) {
-	self.set(StatusRegister::VBLANK_STARTED, flag);
+        self.set(StatusRegister::VBLANK_STARTED, flag);
     }
 
     pub fn check_vblank_started(&self) -> bool {
-	self.contains(StatusRegister::VBLANK_STARTED)
+        self.contains(StatusRegister::VBLANK_STARTED)
     }
 
     pub fn reset_vblank_started(&mut self) {
-	self.remove(StatusRegister::VBLANK_STARTED);
+        self.remove(StatusRegister::VBLANK_STARTED);
     }
-    
+
     pub fn get_status(&self) -> u8 {
-	self.bits
+        self.bits
+    }
+
+    pub fn update(&mut self, data: u8) {
+        self.bits = data;
     }
 }

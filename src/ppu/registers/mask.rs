@@ -12,14 +12,14 @@ bitflags! {
     // |+-------- Emphasize green (red on PAL/Dendy)
     // +--------- Emphasize blue
     pub struct MaskRegister: u8 {
-	const GRAY_SCALE           = 0b0000_0001;
-	const SHOW_BACKGROUND_LEFT = 0b0000_0010;
-	const SHOW_SPRITE_LEFT     = 0b0000_0100;
-	const SHOW_BACKGROUND      = 0b0000_1000;
-	const SHOW_SPRITES         = 0b0001_0000;
-	const EMPHASIZE_RED        = 0b0010_0000;
-	const EMPHASIZE_GREEN      = 0b0100_0000;
-	const EMPHASIZE_BLUE       = 0b1000_0000;
+    const GRAY_SCALE           = 0b0000_0001;
+    const SHOW_BACKGROUND_LEFT = 0b0000_0010;
+    const SHOW_SPRITE_LEFT     = 0b0000_0100;
+    const SHOW_BACKGROUND      = 0b0000_1000;
+    const SHOW_SPRITES         = 0b0001_0000;
+    const EMPHASIZE_RED        = 0b0010_0000;
+    const EMPHASIZE_GREEN      = 0b0100_0000;
+    const EMPHASIZE_BLUE       = 0b1000_0000;
     }
 }
 
@@ -31,45 +31,44 @@ pub enum Color {
 
 impl MaskRegister {
     pub fn new() -> Self {
-	MaskRegister::from_bits_truncate(0b0000_0000)
+        MaskRegister::from_bits_truncate(0b0000_0000)
     }
 
     pub fn check_gray_scale(&self) -> bool {
-	self.contains(MaskRegister::GRAY_SCALE)
+        self.contains(MaskRegister::GRAY_SCALE)
     }
 
     pub fn check_show_background_left(&self) -> bool {
-	self.contains(MaskRegister::SHOW_BACKGROUND_LEFT)
+        self.contains(MaskRegister::SHOW_BACKGROUND_LEFT)
     }
 
     pub fn check_show_sprite_left(&self) -> bool {
-	self.contains(MaskRegister::SHOW_SPRITE_LEFT)
+        self.contains(MaskRegister::SHOW_SPRITE_LEFT)
     }
 
     pub fn check_show_background(&self) -> bool {
-	self.contains(MaskRegister::SHOW_BACKGROUND)
+        self.contains(MaskRegister::SHOW_BACKGROUND)
     }
 
     pub fn check_show_sprites(&self) -> bool {
-	self.contains(MaskRegister::SHOW_SPRITES)
+        self.contains(MaskRegister::SHOW_SPRITES)
     }
 
     pub fn emphasize_red(&self) -> Vec<Color> {
-	let mut res = Vec::<Color>::new();
-	if self.contains(MaskRegister::EMPHASIZE_RED) {
-	    res.push(Color::Red);
-	}
-	if self.contains(MaskRegister::EMPHASIZE_BLUE) {
-	    res.push(Color::Blue);
-	}
-	if self.contains(MaskRegister::EMPHASIZE_GREEN) {
-	    res.push(Color::Green);
-	}
-	res
+        let mut res = Vec::<Color>::new();
+        if self.contains(MaskRegister::EMPHASIZE_RED) {
+            res.push(Color::Red);
+        }
+        if self.contains(MaskRegister::EMPHASIZE_BLUE) {
+            res.push(Color::Blue);
+        }
+        if self.contains(MaskRegister::EMPHASIZE_GREEN) {
+            res.push(Color::Green);
+        }
+        res
     }
 
     pub fn update(&mut self, data: u8) {
-	self.bits = data;
+        self.bits = data;
     }
-
 }
